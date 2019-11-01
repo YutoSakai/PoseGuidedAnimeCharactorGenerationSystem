@@ -275,6 +275,7 @@ optimizerD = optim.Adam(netD.parameters(), lr=2e-5, betas=(0.5, 0.999))
 for epoch in range(opt.niterG1):
     for i, data in enumerate(data_loader, 0):
         netG1.zero_grad()
+        data, _ = data
         condition_Ia_cpu, _ = data[:, 0:3, :, :]
         target_Pb_cpu, _ = data[:, 3:21, :, :]
         target_Ib_cpu, _ = data[:, 21:24, :, :]
@@ -346,8 +347,7 @@ for epoch in range(opt.niterG2):
             print('[%d/%d][%d/%d] Loss_G2: %.4f' % (epoch, opt.niterG2, i, len(data_loader), errG2.data[0]))
 
     if epoch % 10 == 0:
-        vutils.save_image(refined_pred_Ib,
-                          'out/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
+        vutils.save_image(refined_pred_Ib, 'out/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
                           normalize=True)
 
     # do checkpointing

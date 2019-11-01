@@ -1,5 +1,5 @@
 import torch
-
+import numpy as np
 
 class MyDataset(torch.utils.data.Dataset):
     def __init__(self, data_num, transform=None):
@@ -8,7 +8,7 @@ class MyDataset(torch.utils.data.Dataset):
         self.data = []
         self.label = []
         for x in range(self.data_num):
-            self.data.append(x)  # 0 から (data_num-1) までのリスト
+            self.data.append(np.zeros([24, 256, 256]))  # 0 から (data_num-1) までのリスト
             self.label.append(x % 2 == 0)  # 偶数ならTrue 奇数ならFalse
 
     def __len__(self):
