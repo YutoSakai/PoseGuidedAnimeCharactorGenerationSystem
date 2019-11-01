@@ -1,17 +1,14 @@
 from __future__ import print_function
 import argparse
-import os
 import random
-import torch
 import torch.nn as nn
-import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.optim as optim
 import torch.utils.data
-import torchvision.datasets as dset
-import torchvision.transforms as transforms
 import torchvision.utils as vutils
 from torch.autograd import Variable
+
+from Dataset import MyDataset
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--batchSize', type=int, default=8, help='input batch size')
@@ -21,7 +18,9 @@ parser.add_argument('--L1_lambda', type=int, default=1, help='L1_lambda for G2')
 parser.add_argument('--cuda', action='store_true', help='enables cuda')
 parser.add_argument('--manualSeed', type=int, help='manual seed')
 
-data_loader = None
+data_set = MyDataset(10)
+data_loader = torch.utils.data.DataLoader(data_set, batch_size=2, shuffle=True)
+
 opt = parser.parse_args()
 print(opt)
 if opt.manualSeed is None:
@@ -30,19 +29,19 @@ print("Random Seed: ", opt.manualSeed)
 random.seed(opt.manualSeed)
 torch.manual_seed(opt.manualSeed)
 if opt.cuda:
-    torch.cuda.manual_seed_all(opt.manualSeed)
+    # torch.cuda.manual_seed_all(opt.manualSeed)
+    torch.manual_seed(opt.manualSeed)
 
 cudnn.benchmark = True
 
 if torch.cuda.is_available() and not opt.cuda:
     print("WARNING: You have a CUDA device, so you should probably run with --cuda")
 
-'''Generator at stage-1 (G1)'''
 
-
-class _netG1(nn.Module):
+class NetG1(nn.Module):
+    """Generator at stage-1 (G1)"""
     def __init__(self):
-        super(_netG1, self).__init__()
+        super(NetG1, self).__init__()
         # input bs x 21 x 256 x256
         self.conv_1 = nn.Conv2d(21, 64, kernel_size=3, stride=1, padding=1)
         # state bs x 64 x 256 x 256
@@ -88,9 +87,9 @@ class _netG1(nn.Module):
         self.deconv_6 = nn.ConvTranspose2d(64, 3, kernel_size=3, stride=1, padding=1)
         # state bs x 3 x 256 x 256
 
-    def forward(self, input):
+    def forward(self, x):
         # encoding
-        out_from_e_1 = self.e_block_1(self.conv_1(input))
+        out_from_e_1 = self.e_block_1(self.conv_1(x))
         out_from_e_2 = self.e_block_2(self.conv_2(out_from_e_1))
         out_from_e_3 = self.e_block_3(self.conv_3(out_from_e_2))
         out_from_e_4 = self.e_block_4(self.conv_4(out_from_e_3))
@@ -113,12 +112,10 @@ class _netG1(nn.Module):
         return out_from_de_6
 
 
-'''Generator at stage-2 (G2)'''
-
-
-class _netG2(nn.Module):
+class NetG2(nn.Module):
+    """Generator at stage-2 (G2)"""
     def __init__(self):
-        super(_netG2, self).__init__()
+        super(NetG2, self).__init__()
         # encoder
         # input bs x 6 x 256 x256
         self.conv_1 = nn.Conv2d(6, 64, kernel_size=3, stride=1, padding=1)
@@ -148,9 +145,9 @@ class _netG2(nn.Module):
         self.de_block_4 = ResBlock(64)
         self.deconv_4 = nn.ConvTranspose2d(64, 3, kernel_size=3, stride=1, padding=1)
 
-    def forward(self, input):
+    def forward(self, x):
         # encoding
-        out_from_e_1 = self.e_block_1(self.conv_1(input))
+        out_from_e_1 = self.e_block_1(self.conv_1(x))
         out_from_e_2 = self.e_block_2(self.conv_2(out_from_e_1))
         out_from_e_3 = self.e_block_3(self.conv_3(out_from_e_2))
         out_from_e_4 = self.e_block_4(self.conv_4(out_from_e_3))
@@ -163,10 +160,8 @@ class _netG2(nn.Module):
         return out_from_de_4
 
 
-'''Residual Block (-Conv-ReLU-Conv-ReLU-(+shortcut)-)'''
-
-
 class ResBlock(nn.Module):
+    """Residual Block (-Conv-ReLU-Conv-ReLU-(+shortcut)-)"""
     def __init__(self, ch):
         super(ResBlock, self).__init__()
         # ch has no change
@@ -183,12 +178,10 @@ class ResBlock(nn.Module):
         return out
 
 
-'''Discriminator at stage-2 (D)'''
-
-
-class _netD(nn.Module):
+class NetD(nn.Module):
+    """Discriminator at stage-2 (D)"""
     def __init__(self):
-        super(_netD, self).__init__()
+        super(NetD, self).__init__()
 
         ndf = 64
         self.main = nn.Sequential(
@@ -220,14 +213,12 @@ class _netD(nn.Module):
             nn.Sigmoid()
         )
 
-    def forward(self, input):
-        return self.main(input).view(-1, 1)
-
-
-'''custom weights initialization called on netG and netD'''
+    def forward(self, x):
+        return self.main(x).view(-1, 1)
 
 
 def weights_init(m):
+    """custom weights initialization called on netG and netD"""
     class_name = m.__class__.__name__
     if class_name.find('Conv') != -1:
         m.weight.data.normal_(0.0, 0.02)
@@ -237,11 +228,11 @@ def weights_init(m):
 
 
 '''setup network and initialize weights'''
-netG1 = _netG1()
+netG1 = NetG1()
 netG1.apply(weights_init)
-netG2 = _netG2()
+netG2 = NetG2()
 netG2.apply(weights_init)
-netD = _netD()
+netD = NetD()
 netD.apply(weights_init)
 
 '''criterion'''
@@ -301,12 +292,11 @@ for epoch in range(opt.niterG1):
             print('[%d/%d][%d/%d] Loss_G1: %.4f' % (epoch, opt.niterG1, i, len(data_loader), errG1.data[0]))
 
     if epoch % 10 == 0:
-        vutils.save_image(pred_Ib,
-                          'out/pred_Ib_trainingG1_epoch_%03d.png' % (epoch),
+        vutils.save_image(pred_Ib, 'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
     # do checkpointing
     if epoch % 100 == 0:
-        torch.save(netG1.state_dict(), 'outpth/netG1_epoch_%d.pth' % (epoch))
+        torch.save(netG1.state_dict(), 'outpth/netG1_epoch_%d.pth' % epoch)
 
 '''training Adversarial net (G2 and D)'''
 for epoch in range(opt.niterG2):
@@ -343,7 +333,7 @@ for epoch in range(opt.niterG2):
 
         optimizerD.step()
 
-        # tarin G with pairs
+        # train G with pairs
         output_fake = netD(fake_pair)
         label.data.fill_(real_label)  # fake labels are real for generator cost
         errG2 = BCE_criterion(output_fake, label)
