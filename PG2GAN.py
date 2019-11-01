@@ -11,15 +11,12 @@ from torch.autograd import Variable
 from Dataset import MyDataset
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--batchSize', type=int, default=8, help='input batch size')
-parser.add_argument('--niterG1', type=int, default=10, help='number of epochs to train for G1')
+parser.add_argument('--batchSize', type=int, default=2, help='input batch size')
+parser.add_argument('--niterG1', type=int, default=1, help='number of epochs to train for G1')
 parser.add_argument('--niterG2', type=int, default=10, help='number of epochs to train for G2')
 parser.add_argument('--L1_lambda', type=int, default=1, help='L1_lambda for G2')
 parser.add_argument('--cuda', action='store_true', help='enables cuda')
 parser.add_argument('--manualSeed', type=int, help='manual seed')
-
-data_set = MyDataset(10)
-data_loader = torch.utils.data.DataLoader(data_set, batch_size=2, shuffle=True)
 
 opt = parser.parse_args()
 print(opt)
@@ -31,6 +28,10 @@ torch.manual_seed(opt.manualSeed)
 if opt.cuda:
     # torch.cuda.manual_seed_all(opt.manualSeed)
     torch.manual_seed(opt.manualSeed)
+
+data_set = MyDataset(10)
+data_loader = torch.utils.data.DataLoader(data_set, batch_size=opt.batchSize, shuffle=True)
+
 
 cudnn.benchmark = True
 
@@ -166,9 +167,9 @@ class ResBlock(nn.Module):
         super(ResBlock, self).__init__()
         # ch has no change
         self.res_conv_1 = nn.Conv2d(ch, ch, kernel_size=3, stride=1, padding=1)
-        self.res_relu_1 = nn.ReLU(True)
+        self.res_relu_1 = nn.ReLU()
         self.res_conv_2 = nn.Conv2d(ch, ch, kernel_size=3, stride=1, padding=1)
-        self.res_relu_2 = nn.ReLU(True)
+        self.res_relu_2 = nn.ReLU()
 
     def forward(self, x):
         out = self.res_relu_1(self.res_conv_1(x))
@@ -187,27 +188,27 @@ class NetD(nn.Module):
         self.main = nn.Sequential(
             # input bs x 6 x 256 x 256
             nn.Conv2d(6, ndf, 4, 2, 1, bias=False),
-            nn.LeakyReLU(0.2, inplace=True),
+            nn.LeakyReLU(0.2),
             # state bs x (ndf) x 128 x 128
             nn.Conv2d(ndf, ndf * 2, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 2),
-            nn.LeakyReLU(0.2, inplace=True),
+            nn.LeakyReLU(0.2),
             # state bs x (ndf*2) x 64 x 64
             nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 4),
-            nn.LeakyReLU(0.2, inplace=True),
+            nn.LeakyReLU(0.2),
             # state bs x (ndf*4) x 32 x 32
             nn.Conv2d(ndf * 4, ndf * 8, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 8),
-            nn.LeakyReLU(0.2, inplace=True),
+            nn.LeakyReLU(0.2),
             # state bs x (ndf*8) x 16 x 16
             nn.Conv2d(ndf * 8, ndf * 16, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 16),
-            nn.LeakyReLU(0.2, inplace=True),
+            nn.LeakyReLU(0.2),
             # state bs x (ndf*16) x 8 x 8
             nn.Conv2d(ndf * 16, ndf * 32, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 32),
-            nn.LeakyReLU(0.2, inplace=True),
+            nn.LeakyReLU(0.2),
             # state bs x (ndf) x 4 x 4
             nn.Conv2d(ndf * 32, 1, 4, 1, 0, bias=False),
             nn.Sigmoid()
@@ -239,12 +240,6 @@ netD.apply(weights_init)
 L1_criterion = nn.L1Loss()
 BCE_criterion = nn.BCELoss()
 
-'''define variables'''
-condition_Ia = torch.FloatTensor(opt.batchSize, 3, 256, 256)
-target_Pb = torch.FloatTensor(opt.batchSize, 18, 256, 256)
-target_Ib = torch.FloatTensor(opt.batchSize, 3, 256, 256)
-label = torch.FloatTensor(opt.batchSize)
-
 real_label = 1
 fake_label = 0
 
@@ -255,16 +250,6 @@ if opt.cuda:
     netD.cuda()
     L1_criterion.cuda()
     BCE_criterion.cuda()
-    condition_Ia = condition_Ia.cuda()
-    target_Pb = target_Pb.cuda()
-    target_Ib = target_Ib.cuda()
-    label = label.cuda()
-
-'''to Variable'''
-condition_Ia = Variable(condition_Ia)
-target_Pb = Variable(target_Pb)
-target_Ib = Variable(target_Ib)
-label = Variable(label)
 
 '''setup optimizer'''
 optimizerG1 = optim.Adam(netG1.parameters(), lr=2e-5, betas=(0.5, 0.999))
@@ -276,13 +261,13 @@ for epoch in range(opt.niterG1):
     for i, data in enumerate(data_loader, 0):
         netG1.zero_grad()
         data, _ = data
-        condition_Ia_cpu, _ = data[:, 0:3, :, :]
-        target_Pb_cpu, _ = data[:, 3:21, :, :]
-        target_Ib_cpu, _ = data[:, 21:24, :, :]
-        condition_Ia.data.copy_(condition_Ia_cpu)
-        target_Pb.data.copy_(target_Pb_cpu)
-        target_Ib.data.copy_(target_Ib_cpu)
-
+        condition_Ia = data[:, 0:3, :, :]
+        target_Pb = data[:, 3:21, :, :]
+        target_Ib = data[:, 21:24, :, :]
+        if opt.cuda:
+            condition_Ia = condition_Ia.cuda()
+            target_Pb = target_Pb.cuda()
+            target_Ib = target_Ib.cuda()
         input_G1 = torch.cat((condition_Ia, target_Pb), 1)  # input_G1 bs x 21 x 256 x256
         pred_Ib = netG1(input_G1)
         errG1 = L1_criterion(pred_Ib, target_Ib)  # this is not pose-mask-loss
@@ -290,7 +275,7 @@ for epoch in range(opt.niterG1):
         optimizerG1.step()
 
         if i % 100 == 0:
-            print('[%d/%d][%d/%d] Loss_G1: %.4f' % (epoch, opt.niterG1, i, len(data_loader), errG1.data[0]))
+            print('[%d/%d][%d/%d] Loss_G1: %.4f' % (epoch, opt.niterG1, i, len(data_loader), errG1.data.item()))
 
     if epoch % 10 == 0:
         vutils.save_image(pred_Ib, 'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
@@ -305,12 +290,16 @@ for epoch in range(opt.niterG2):
         netG2.zero_grad()
         netD.zero_grad()
 
-        condition_Ia_cpu, _ = data[:, 0:3, :, :]
-        target_Pb_cpu, _ = data[:, 3:21, :, :]
-        target_Ib_cpu, _ = data[:, 21:24, :, :]
-        condition_Ia.data.copy_(condition_Ia_cpu)
-        target_Pb.data.copy_(target_Pb_cpu)
-        target_Ib.data.copy_(target_Ib_cpu)
+        data, label = data
+
+        condition_Ia = data[:, 0:3, :, :]
+        target_Pb = data[:, 3:21, :, :]
+        target_Ib = data[:, 21:24, :, :]
+        if opt.cuda:
+            condition_Ia = condition_Ia.cuda()
+            target_Pb = target_Pb.cuda()
+            target_Ib = target_Ib.cuda()
+            label = label.cuda()
 
         input_G1 = torch.cat((condition_Ia, target_Pb), 1)  # input_G1 bs x 21 x 256 x256
         pred_Ib = netG1(input_G1).detach()
@@ -323,11 +312,12 @@ for epoch in range(opt.niterG2):
 
         # train D with pairs
         output_real = netD(real_pair)
-        label.data.fill_(real_label)
+        output_real = torch.squeeze(output_real)
         errD_real = BCE_criterion(output_real, label)
         errD_real.backward()
 
         output_fake = netD(fake_pair.detach())  # detach
+        output_fake = torch.squeeze(output_fake)
         label.data.fill_(fake_label)
         errD_fake = BCE_criterion(output_fake, label)
         errD_fake.backward()
@@ -336,6 +326,7 @@ for epoch in range(opt.niterG2):
 
         # train G with pairs
         output_fake = netD(fake_pair)
+        output_fake = torch.squeeze(output_fake)
         label.data.fill_(real_label)  # fake labels are real for generator cost
         errG2 = BCE_criterion(output_fake, label)
         errG2 += opt.L1_lambda * L1_criterion(refined_pred_Ib, target_Ib)
@@ -344,7 +335,7 @@ for epoch in range(opt.niterG2):
         optimizerG2.step()
 
         if i % 100 == 0:
-            print('[%d/%d][%d/%d] Loss_G2: %.4f' % (epoch, opt.niterG2, i, len(data_loader), errG2.data[0]))
+            print('[%d/%d][%d/%d] Loss_G2: %.4f' % (epoch, opt.niterG2, i, len(data_loader), errG2.data.item()))
 
     if epoch % 10 == 0:
         vutils.save_image(refined_pred_Ib, 'out/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
