@@ -1,25 +1,52 @@
 import torch
+import torch.utils.data
 import numpy as np
+import os
+from PIL import Image
+import glob
 
+img_folder_path = "../deepfashion/img_highres"
 
 class MyDataset(torch.utils.data.Dataset):
-    def __init__(self, data_num, transform=None):
+    def __init__(self, transform=None):
         self.transform = transform
-        self.data_num = data_num
-        self.data = []
+        self.path = []
         self.label = []
-        for x in range(self.data_num):
-            self.data.append(np.zeros([24, 256, 256], dtype=np.float32))  # 0 から (data_num-1) までのリスト
-            self.label.append(np.float32(x % 2 == 0))  # 偶数ならTrue 奇数ならFalse
+        # for file in glob.glob("../deepfashion/img_highres/**/*full*", recursive=True):
+        #     print(file)
+        #     self.path.append(file)
+        # print(len(self.path))
+        # exit(1)
+        for root, dirs, files in os.walk("../deepfashion/img_highres"):
+            print('---------')
+            print("root:" + root)
+            print(dirs)
+            print(files)
+            pair = []
+            if files!=[]:
+                for i, file in enumerate(files):
+                    print(file[1])
+            # for dir in dirs:
+            #
+            #     for file in files:
+            #         file = os.path.join(root, file)
+            #         print(file)
+            #         self.path.append(file)  # 0 から (data_num-1) までのリスト　いつかはここを画像にせな
+            #         self.label.append(np.float32(1))  # 偶数ならTrue 奇数ならFalse
 
     def __len__(self):
         return self.data_num
 
     def __getitem__(self, idx):
-        out_data = self.data[idx]
+        # バッチを読み込むごとに画像データを読み込んでくる
+        out_data = Image.open(self.path[idx])
+        # リサイズ
+        out_data = Image.resize(out_data)
         out_label = self.label[idx]
 
         if self.transform:
             out_data = self.transform(out_data)
 
         return out_data, out_label
+
+myDataset = MyDataset()

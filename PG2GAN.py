@@ -29,7 +29,7 @@ if opt.cuda:
     # torch.cuda.manual_seed_all(opt.manualSeed)
     torch.manual_seed(opt.manualSeed)
 
-data_set = MyDataset(10)
+data_set = MyDataset()
 data_loader = torch.utils.data.DataLoader(data_set, batch_size=opt.batchSize, shuffle=True)
 
 
