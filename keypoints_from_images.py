@@ -45,7 +45,7 @@ try:
         import pyopenpose as op
     else:
         # Change these variables to point to the correct folder (Release/x64 etc.)
-        sys.path.append('../../python');
+        sys.path.append('/openpose/build/python');
         # If you run `make install` (default path is `/usr/local/python` for Ubuntu), you can also access the OpenPose/python module from there. This will install OpenPose and the python library at your desired installation path. Ensure that this is in your python path in order to use it.
         # sys.path.append('/usr/local/python')
         from openpose import pyopenpose as op
@@ -55,13 +55,13 @@ except ImportError as e:
 
 # Flags
 parser = argparse.ArgumentParser()
-parser.add_argument("--image_dir", default="../../../examples/media/", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
+parser.add_argument("--image_dir", default="/openpose/examples/media/", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
 parser.add_argument("--no_display", default=False, help="Enable to disable the visual display.")
 args = parser.parse_known_args()
 
 # Custom Params (refer to include/openpose/flags.hpp for more parameters)
 params = dict()
-params["model_folder"] = "../../../models/"
+params["model_folder"] = "/openpose/models/"
 
 # Add others in path?
 for i in range(0, len(args[1])):
@@ -97,6 +97,7 @@ try:
         datum.cvInputData = imageToProcess
         opWrapper.emplaceAndPop([datum])
         return_img = draw_keypoints(imageToProcess, datum.poseKeypoints, num)
+        np.save(imagePath[:-4] + "_keypoints", return_img)
         # print("Body keypoints: \n" + str(datum.poseKeypoints))
 
         if not args[0].no_display:
