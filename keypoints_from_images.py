@@ -9,6 +9,9 @@ import time
 import numpy as np
 import glob
 
+sys.path.append('/openpose/build/python')
+from openpose import pyopenpose as op
+
 
 def draw_keypoints(img, humans):
     image_h, image_w = img.shape[:2]
@@ -36,41 +39,20 @@ def draw_keypoints(img, humans):
 
 
 def return_keypoints(imagePath):
-        print(imagePath)
-        datum = op.Datum()
-        imageToProcess = cv2.imread(imagePath)
-        datum.cvInputData = imageToProcess
-        opWrapper.emplaceAndPop([datum])
-        # print(datum.poseKeypoints)
-        try: 
-            int(datum.poseKeypoints)
-            continue
-        except:
-            return_img = draw_keypoints(imageToProcess, datum.poseKeypoints)
-            np.save(imagePath[:-4] + "_keypoints", return_img)
-    
-    return 
+    print(imagePath)
+    datum = op.Datum()
+    imageToProcess = cv2.imread(imagePath)
+    datum.cvInputData = imageToProcess
+    opWrapper.emplaceAndPop([datum])
+    try:
+        int(datum.poseKeypoints)
+        return None
+    except:
+        return_img = np.concatenate(draw_keypoints(imageToProcess, datum.poseKeypoints), imageToProcess, axis=1)
+        return return_img
       
 
-
-# Import Openpose (Windows/Ubuntu/OSX)
 dir_path = os.path.dirname(os.path.realpath(__file__))
-try:
-    # Windows Import
-    if platform == "win32":
-        # Change these variables to point to the correct folder (Release/x64 etc.)
-        sys.path.append(dir_path + '/../../python/openpose/Release');
-        os.environ['PATH']  = os.environ['PATH'] + ';' + dir_path + '/../../x64/Release;' +  dir_path + '/../../bin;'
-        import pyopenpose as op
-    else:
-        # Change these variables to point to the correct folder (Release/x64 etc.)
-        sys.path.append('/openpose/build/python');
-        # If you run `make install` (default path is `/usr/local/python` for Ubuntu), you can also access the OpenPose/python module from there. This will install OpenPose and the python library at your desired installation path. Ensure that this is in your python path in order to use it.
-        # sys.path.append('/usr/local/python')
-        from openpose import pyopenpose as op
-except ImportError as e:
-    print('Error: OpenPose library could not be found. Did you enable `BUILD_PYTHON` in CMake and have this Python script in the right folder?')
-    raise e
 
 # Flags
 parser = argparse.ArgumentParser()
