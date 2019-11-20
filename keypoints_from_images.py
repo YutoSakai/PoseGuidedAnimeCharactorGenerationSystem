@@ -10,7 +10,7 @@ import numpy as np
 import glob
 
 
-def draw_keypoints(img, humans, num):
+def draw_keypoints(img, humans):
     image_h, image_w = img.shape[:2]
     return_images = []
     all_keypoints_img = np.zeros((image_h, image_w), np.uint8)
@@ -33,6 +33,24 @@ def draw_keypoints(img, humans, num):
     # print(len(return_images))
 
     return return_images
+
+
+def return_keypoints(imagePath):
+        print(imagePath)
+        datum = op.Datum()
+        imageToProcess = cv2.imread(imagePath)
+        datum.cvInputData = imageToProcess
+        opWrapper.emplaceAndPop([datum])
+        # print(datum.poseKeypoints)
+        try: 
+            int(datum.poseKeypoints)
+            continue
+        except:
+            return_img = draw_keypoints(imageToProcess, datum.poseKeypoints)
+            np.save(imagePath[:-4] + "_keypoints", return_img)
+    
+    return 
+      
 
 
 # Import Openpose (Windows/Ubuntu/OSX)

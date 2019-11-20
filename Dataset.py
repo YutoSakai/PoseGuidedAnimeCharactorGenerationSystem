@@ -10,13 +10,22 @@ img_folder_path = "../deepfashion/img_highres"
 class MyDataset(torch.utils.data.Dataset):
     def __init__(self, transform=None):
         self.transform = transform
-        self.path = []
+        self.data = []
+        self.img_paths = []
+        self.keypoints = []
         self.label = []
-        # for file in glob.glob("../deepfashion/img_highres/**/*full*", recursive=True):
-        #     print(file)
-        #     self.path.append(file)
-        # print(len(self.path))
-        # exit(1)
+        for img_path in glob.glob("/img_highres/**/*.jpg", recursive=True):
+            try:
+                keypoint = np.load(file=img_path[:-4]+".npy")
+                self.img_paths.append(img_path)
+                self.keypoints.append(keypoint)
+                self.data.append(np.concatenate((img_path, keypoint), axis=1))
+                print(data)
+                exit(1)
+            except:
+                continue
+        print(len(self.path))
+        exit(1)
         for root, dirs, files in os.walk("../deepfashion/img_highres"):
             print('---------')
             print("root:" + root)
