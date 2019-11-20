@@ -7,29 +7,30 @@ from sys import platform
 import argparse
 import time
 import numpy as np
+import glob
 
 
 def draw_keypoints(img, humans, num):
     image_h, image_w = img.shape[:2]
     return_images = []
     all_keypoints_img = np.zeros((image_h, image_w), np.uint8)
-    print(num)
-    print(humans)
+    # print(num)
+    # print(humans)
     for i, human in enumerate(humans):
-        print(i)
+        # print("human"+str(i))
         for j, keypoint in enumerate(human):
-            print(j)
+            black_img = np.zeros((image_h, image_w), np.uint8)  
             if (keypoint[0] == 0) and (keypoint[1] == 0):
                 return_images.append(black_img)
                 continue
             # draw point
-            black_img = np.zeros((image_h, image_w), np.uint8)  
             center = (int(keypoint[0]), int(keypoint[1]))
             return_images.append(cv2.circle(black_img, center, 3, 255, thickness=3, lineType=8, shift=0))
             # cv2.imwrite("keypoint" + str(num) + "-" + str(i) + "-" + str(j) + ".png", cv2.circle(black_img, center, 3, 255, thickness=3, lineType=8, shift=0))
             all_keypoints_img = cv2.circle(all_keypoints_img, center, 3, 255, thickness=3, lineType=8, shift=0)
-            print("all_keypoints_img updated.")
-    cv2.imwrite("keypoint" + str(num) + ".png", all_keypoints_img)
+            # print("all_keypoints_img updated.")
+    # cv2.imwrite("keypoint" + str(num) + ".png", all_keypoints_img)
+    # print(len(return_images))
 
     return return_images
 
@@ -55,7 +56,7 @@ except ImportError as e:
 
 # Flags
 parser = argparse.ArgumentParser()
-parser.add_argument("--image_dir", default="/openpose/examples/media/", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
+parser.add_argument("--image_dir", default="/img_highres", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
 parser.add_argument("--no_display", default=False, help="Enable to disable the visual display.")
 args = parser.parse_known_args()
 
@@ -86,7 +87,8 @@ try:
     opWrapper.start()
 
     # Read frames on directory
-    imagePaths = op.get_images_on_directory(args[0].image_dir);
+    # imagePaths = op.get_images_on_directory(args[0].image_dir);
+    imagePaths = glob.glob("/img_highres/**/*.jpg", recursive=True)    
     start = time.time()
 
     # Process and display images
@@ -96,14 +98,19 @@ try:
         imageToProcess = cv2.imread(imagePath)
         datum.cvInputData = imageToProcess
         opWrapper.emplaceAndPop([datum])
-        return_img = draw_keypoints(imageToProcess, datum.poseKeypoints, num)
-        np.save(imagePath[:-4] + "_keypoints", return_img)
-        # print("Body keypoints: \n" + str(datum.poseKeypoints))
+        # print(datum.poseKeypoints)
+        try: 
+            int(datum.poseKeypoints)
+            continue
+        except:
+            return_img = draw_keypoints(imageToProcess, datum.poseKeypoints, num)
+            np.save(imagePath[:-4] + "_keypoints", return_img)
+            # print("Body keypoints: \n" + str(datum.poseKeypoints))
 
-        if not args[0].no_display:
-            cv2.imwrite("test04.png", datum.cvOutputData)
-            key = cv2.waitKey(15)
-            if key == 27: break
+            if not args[0].no_display:
+                cv2.imwrite("test04.png", datum.cvOutputData)
+                key = cv2.waitKey(15)
+                if key == 27: break
 
     end = time.time()
     print("OpenPose demo successfully finished. Total time: " + str(end - start) + " seconds")
