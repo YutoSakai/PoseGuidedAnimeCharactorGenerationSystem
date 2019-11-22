@@ -5,6 +5,7 @@ import os
 from PIL import Image
 import glob
 import keypoints_from_images
+import cv2
 
 img_folder_path = "/img_highres"
 
@@ -18,12 +19,21 @@ class MyDataset(torch.utils.data.Dataset):
 
     def return_data(self, idx):
         # バッチを読み込むごとに画像データを読み込んでくる
-        out_data = keypoints_from_images.return_keypoints(self.img_paths[idx])  # [Pb,Ib]　あとはIaを前につなげたい
+        pair = []
+        for img_path in self.img_paths:
+            pbib_data = keypoints_from_images.return_keypoints(img_path)  # [Pb,Ib]　あとはIaを前につなげたい
+            data_dir = os.path.dirname(img_path)
+            for pair_data_path in glob.glob(data_dir + "/*.jpg", recursive=True):
+                if pair_data_path == img_path:
+                    continue
+                pair_data = cv2.imread(pair_data_path)
+                pair.append(np.concatenate(pair_data, pbib_data))   # [Ia,Pb,Ib]でコンキャットできたばず　あとは例外処理
+
 
         if self.transform:
-            out_data = self.transform(out_data)
+            out_data = self.transform(pbib_data)
 
-        return out_data
+        return pbib_data
 
 
 myDataset = MyDataset()

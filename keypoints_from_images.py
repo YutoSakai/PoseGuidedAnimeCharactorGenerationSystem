@@ -38,7 +38,7 @@ def draw_keypoints(img, humans):
     return return_images
 
 
-def return_keypoints(imagePath):
+def return_keypoints(imagePath):    # [Pb, Ib]をリターン　ポーズが取れなかった場合はNoneをリターン
     print(imagePath)
     datum = op.Datum()
     imageToProcess = cv2.imread(imagePath)
