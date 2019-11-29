@@ -12,49 +12,51 @@ import glob
 sys.path.append('/openpose/build/python')
 from openpose import pyopenpose as op
 
+class OpenPose:
+    def __init__(self):
+        self.opWrapper = op.WrapperPython()
+        self.opWrapper.configure(params)
+        self.opWrapper.start()
+        self.datum = op.Datum()
 
-def draw_keypoints(img, humans):
-    image_h, image_w = img.shape[:2]
-    return_images = []
-    all_keypoints_img = np.zeros((image_h, image_w), np.uint8)
-    # print(num)
-    # print(humans)
-    for i, human in enumerate(humans):
-        # print("human"+str(i))
-        for j, keypoint in enumerate(human):
-            black_img = np.zeros((image_h, image_w), np.uint8)  
-            if (keypoint[0] == 0) and (keypoint[1] == 0):
-                return_images.append(black_img)
-                continue
-            # draw point
-            center = (int(keypoint[0]), int(keypoint[1]))
-            return_images.append(cv2.circle(black_img, center, 3, 255, thickness=3, lineType=8, shift=0))
-            # cv2.imwrite("keypoint" + str(num) + "-" + str(i) + "-" + str(j) + ".png", cv2.circle(black_img, center, 3, 255, thickness=3, lineType=8, shift=0))
-            all_keypoints_img = cv2.circle(all_keypoints_img, center, 3, 255, thickness=3, lineType=8, shift=0)
-            # print("all_keypoints_img updated.")
-    # cv2.imwrite("keypoint" + str(num) + ".png", all_keypoints_img)
-    # print(len(return_images))
+    def draw_keypoints(self, img, humans):
+        image_h, image_w = img.shape[:2]
+        return_images = []
+        all_keypoints_img = np.zeros((image_h, image_w), np.uint8)
+        # print(num)
+        # print(humans)
+        for i, human in enumerate(humans):
+            # print("human"+str(i))
+            for j, keypoint in enumerate(human):
+                black_img = np.zeros((image_h, image_w), np.uint8)
+                if (keypoint[0] == 0) and (keypoint[1] == 0):
+                    return_images.append(black_img)
+                    continue
+                # draw point
+                center = (int(keypoint[0]), int(keypoint[1]))
+                return_images.append(cv2.circle(black_img, center, 3, 255, thickness=3, lineType=8, shift=0))
+                # cv2.imwrite("keypoint" + str(num) + "-" + str(i) + "-" + str(j) + ".png", cv2.circle(black_img, center, 3, 255, thickness=3, lineType=8, shift=0))
+                all_keypoints_img = cv2.circle(all_keypoints_img, center, 3, 255, thickness=3, lineType=8, shift=0)
+                # print("all_keypoints_img updated.")
+        # cv2.imwrite("keypoint" + str(num) + ".png", all_keypoints_img)
+        # print(len(return_images))
 
-    return return_images
+        return return_images
 
 
-def return_Pb_Ib(imagePath):    # [Pb, Ib]をリターン　ポーズが取れなかった場合はNoneをリターン
-    print(imagePath)
-    datum = op.Datum()
-    image = cv2.imread(imagePath)
-    params = dict()
-    params["model_folder"] = "/openpose/models/"
-    opWrapper = op.WrapperPython()
-    opWrapper.configure(params)
-    opWrapper.start()
-    datum.cvInputData = image
-    opWrapper.emplaceAndPop([datum])
-    try:
-        int(datum.poseKeypoints)
-        return None, None
-    except:
-        return_img = draw_keypoints(image, datum.poseKeypoints)
-        return image, return_img
+    def return_Pb_Ib(self, imagePath):    # [Pb, Ib]をリターン　ポーズが取れなかった場合はNoneをリターン
+        print(imagePath)
+        image = cv2.imread(imagePath)
+        params = dict()
+        params["model_folder"] = "/openpose/models/"
+        self.datum.cvInputData = image
+        self.opWrapper.emplaceAndPop([self.datum])
+        try:
+            int(self.datum.poseKeypoints)
+            return None, None
+        except:
+            return_img = self.draw_keypoints(image, self.datum.poseKeypoints)
+            return image, return_img
 
 
 if __name__ == '__main__':
