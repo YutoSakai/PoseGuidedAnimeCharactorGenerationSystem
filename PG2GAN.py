@@ -258,12 +258,8 @@ optimizerD = optim.Adam(netD.parameters(), lr=2e-5, betas=(0.5, 0.999))
 
 '''training G1'''
 for epoch in range(opt.niterG1):
-    for i, data in enumerate(data_loader, 0):
+    for i, condition_Ia, target_Pb, target_Ib in enumerate(data_loader, 0):
         netG1.zero_grad()
-        data, _ = data
-        condition_Ia = data[:, 0:3, :, :]
-        target_Pb = data[:, 3:21, :, :]
-        target_Ib = data[:, 21:24, :, :]
         if opt.cuda:
             condition_Ia = condition_Ia.cuda()
             target_Pb = target_Pb.cuda()

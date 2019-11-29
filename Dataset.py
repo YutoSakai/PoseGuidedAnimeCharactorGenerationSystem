@@ -13,31 +13,41 @@ img_folder_path = "/img_highres"
 class MyDataset(torch.utils.data.Dataset):
     def __init__(self, transform=None):
         self.transform = transform
-        self.img_paths = []
-        for img_path in glob.glob("/img_highres/**/*.jpg", recursive=True):
-            self.img_paths.append(img_path)
-
-    def return_data(self):
-        # バッチを読み込むごとに画像データを読み込んでくる
-        pair = []
+        self.img_paths = [img_path for img_path in glob.glob("/img_highres/**/*.jpg", recursive=True)]
+        self.pair = []
         for img_path in self.img_paths:
-            pbib_data = keypoints_from_images.return_keypoints(img_path)  # [Pb,Ib]　あとはIaを前につなげたい
+            # pbib_data = keypoints_from_images.return_keypoints(img_path)  # [Pb,Ib]　あとはIaを前につなげたい
             data_dir = os.path.dirname(img_path)
-            for pair_data_path in glob.glob(data_dir + "/*.jpg", recursive=True):
-                if pair_data_path == img_path:
-                    continue
-                pair_data = cv2.imread(pair_data_path)
-                pair.append(np.concatenate(pair_data, pbib_data))   # [Ia,Pb,Ib]でコンキャットできたばず　あとは例外処理
-                print("pair appended")
+            basename = os.path.basename(img_path)
+            id_str = basename.split('_')[0]
+            same_id_paths = [i for i in glob.glob(str(data_dir) + str(id_str) + "*.jpg", recursive=True) if i != img_path]
+            for same_id_path in same_id_paths:
+                self.pair.append((img_path, same_id_path))
+            # for pair_data_path in os.path.basename(data_dir):
+            #     if pair_data_path == img_path:
+            #         continue
+            #     pair_data = cv2.imread(pair_data_path)
+            #     pair.append(np.concatenate(pair_data, pbib_data))   # [Ia,Pb,Ib]でコンキャットできたばず　あとは例外処理
+            #     print("pair appended")
 
+    def __len__(self):
+        return len(self.pair)
+
+    def __getitem__(self, idx):
+        Ia_path = self.pair[idx][0]
+        Ib_path = self.pair[idx][1]
+        Ia_data = cv2.imread(Ia_path)
+        Ib_data, Pb_data = keypoints_from_images.return_Pb_Ib(Ib_path)
+        Ia_data = cv2.resize(Ia_data, Ib_data.shape[:2])
 
         if self.transform:
-            out_data = self.transform(pbib_data)
+            Ia_data = self.transform(Ia_data)
+            Ib_data = self.transform(Ib_data)
+            Pb_data = self.transform(Pb_data)
 
-        print(pair)
-
-        return pair
+        return Ia_data, Pb_data, Ib_data
 
 
-myDataset = MyDataset()
-pair = myDataset.return_data()
+if __name__ == '__main__':
+    mydataset = MyDataset()
+    mydataset.__getitem__(0)

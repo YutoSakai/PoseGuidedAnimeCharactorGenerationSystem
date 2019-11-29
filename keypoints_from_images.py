@@ -38,19 +38,19 @@ def draw_keypoints(img, humans):
     return return_images
 
 
-def return_keypoints(imagePath):    # [Pb, Ib]をリターン　ポーズが取れなかった場合はNoneをリターン
+def return_Pb_Ib(imagePath):    # [Pb, Ib]をリターン　ポーズが取れなかった場合はNoneをリターン
     print(imagePath)
     datum = op.Datum()
-    imageToProcess = cv2.imread(imagePath)
-    datum.cvInputData = imageToProcess
+    image = cv2.imread(imagePath)
+    datum.cvInputData = image
     opWrapper.emplaceAndPop([datum])
     try:
         int(datum.poseKeypoints)
         return None
     except:
-        return_img = np.concatenate(draw_keypoints(imageToProcess, datum.poseKeypoints), imageToProcess, axis=1)
-        return return_img
-      
+        return_img = draw_keypoints(image, datum.poseKeypoints)
+        return image, return_img
+
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
