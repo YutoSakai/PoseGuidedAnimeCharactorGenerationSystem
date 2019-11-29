@@ -34,6 +34,7 @@ class MyDataset(torch.utils.data.Dataset):
         return len(self.pair)
 
     def __getitem__(self, idx):
+        print("into getitem")
         Ia_path = self.pair[idx][0]
         Ib_path = self.pair[idx][1]
         Ia_data = cv2.imread(Ia_path)
@@ -50,4 +51,4 @@ class MyDataset(torch.utils.data.Dataset):
 
 if __name__ == '__main__':
     mydataset = MyDataset()
-    mydataset.__getitem__(0)
+    print(mydataset.__getitem__(0))

@@ -52,68 +52,70 @@ def return_Pb_Ib(imagePath):    # [Pb, Ib]をリターン　ポーズが取れ�
         return image, return_img
 
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
+if __name__ == '__main__':
 
-# Flags
-parser = argparse.ArgumentParser()
-parser.add_argument("--image_dir", default="/img_highres", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
-parser.add_argument("--no_display", default=False, help="Enable to disable the visual display.")
-args = parser.parse_known_args()
+    dir_path = os.path.dirname(os.path.realpath(__file__))
 
-# Custom Params (refer to include/openpose/flags.hpp for more parameters)
-params = dict()
-params["model_folder"] = "/openpose/models/"
+    # Flags
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--image_dir", default="/img_highres", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
+    parser.add_argument("--no_display", default=False, help="Enable to disable the visual display.")
+    args = parser.parse_known_args()
 
-# Add others in path?
-for i in range(0, len(args[1])):
-    curr_item = args[1][i]
-    if i != len(args[1])-1: next_item = args[1][i+1]
-    else: next_item = "1"
-    if "--" in curr_item and "--" in next_item:
-        key = curr_item.replace('-','')
-        if key not in params:  params[key] = "1"
-    elif "--" in curr_item and "--" not in next_item:
-        key = curr_item.replace('-','')
-        if key not in params: params[key] = next_item
+    # Custom Params (refer to include/openpose/flags.hpp for more parameters)
+    params = dict()
+    params["model_folder"] = "/openpose/models/"
 
-# Construct it from system arguments
-# op.init_argv(args[1])
-# oppython = op.OpenposePython()
+    # Add others in path?
+    for i in range(0, len(args[1])):
+        curr_item = args[1][i]
+        if i != len(args[1])-1: next_item = args[1][i+1]
+        else: next_item = "1"
+        if "--" in curr_item and "--" in next_item:
+            key = curr_item.replace('-','')
+            if key not in params:  params[key] = "1"
+        elif "--" in curr_item and "--" not in next_item:
+            key = curr_item.replace('-','')
+            if key not in params: params[key] = next_item
 
-try:
-    # Starting OpenPose
-    opWrapper = op.WrapperPython()
-    opWrapper.configure(params)
-    opWrapper.start()
+    # Construct it from system arguments
+    # op.init_argv(args[1])
+    # oppython = op.OpenposePython()
 
-    # Read frames on directory
-    # imagePaths = op.get_images_on_directory(args[0].image_dir);
-    imagePaths = glob.glob("/img_highres/**/*.jpg", recursive=True)    
-    start = time.time()
+    try:
+        # Starting OpenPose
+        opWrapper = op.WrapperPython()
+        opWrapper.configure(params)
+        opWrapper.start()
 
-    # Process and display images
-    for num, imagePath in enumerate(imagePaths):
-        print(imagePath)
-        datum = op.Datum()
-        imageToProcess = cv2.imread(imagePath)
-        datum.cvInputData = imageToProcess
-        opWrapper.emplaceAndPop([datum])
-        # print(datum.poseKeypoints)
-        try: 
-            int(datum.poseKeypoints)
-            continue
-        except:
-            return_img = draw_keypoints(imageToProcess, datum.poseKeypoints, num)
-            np.save(imagePath[:-4] + "_keypoints", return_img)
-            # print("Body keypoints: \n" + str(datum.poseKeypoints))
+        # Read frames on directory
+        # imagePaths = op.get_images_on_directory(args[0].image_dir);
+        imagePaths = glob.glob("/img_highres/**/*.jpg", recursive=True)
+        start = time.time()
 
-            if not args[0].no_display:
-                cv2.imwrite("test04.png", datum.cvOutputData)
-                key = cv2.waitKey(15)
-                if key == 27: break
+        # Process and display images
+        for num, imagePath in enumerate(imagePaths):
+            print(imagePath)
+            datum = op.Datum()
+            imageToProcess = cv2.imread(imagePath)
+            datum.cvInputData = imageToProcess
+            opWrapper.emplaceAndPop([datum])
+            # print(datum.poseKeypoints)
+            try:
+                int(datum.poseKeypoints)
+                continue
+            except:
+                return_img = draw_keypoints(imageToProcess, datum.poseKeypoints, num)
+                np.save(imagePath[:-4] + "_keypoints", return_img)
+                # print("Body keypoints: \n" + str(datum.poseKeypoints))
 
-    end = time.time()
-    print("OpenPose demo successfully finished. Total time: " + str(end - start) + " seconds")
-except Exception as e:
-    # print(e)
-    sys.exit(-1)
+                if not args[0].no_display:
+                    cv2.imwrite("test04.png", datum.cvOutputData)
+                    key = cv2.waitKey(15)
+                    if key == 27: break
+
+        end = time.time()
+        print("OpenPose demo successfully finished. Total time: " + str(end - start) + " seconds")
+    except Exception as e:
+        # print(e)
+        sys.exit(-1)
