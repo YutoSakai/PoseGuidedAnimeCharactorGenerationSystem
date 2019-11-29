@@ -23,6 +23,8 @@ class MyDataset(torch.utils.data.Dataset):
             same_id_paths = [i for i in glob.glob(str(data_dir) + "/" + str(id_str) + "*.jpg", recursive=True) if i != img_path]
             for same_id_path in same_id_paths:
                 self.pair.append((img_path, same_id_path))
+                if len(self.pair) > 100:
+                    return
             # for pair_data_path in os.path.basename(data_dir):
             #     if pair_data_path == img_path:
             #         continue
@@ -40,7 +42,10 @@ class MyDataset(torch.utils.data.Dataset):
         Ib_path = self.pair[idx][1]
         Ia_data = cv2.imread(Ia_path)
         Ib_data, Pb_data = keypoints_from_images.return_Pb_Ib(Ib_path)
-        Ia_data = cv2.resize(Ia_data, Ib_data.shape[:2])
+        Pb_data = np.array(Pb_data)
+        Ia_data = cv2.resize(Ia_data, (Ib_data.shape[1], Ib_data.shape[0]))
+        Ia_data = Ia_data.transpose((2, 0, 1))
+        Ib_data = Ib_data.transpose((2, 0, 1))
 
         if self.transform:
             Ia_data = self.transform(Ia_data)
@@ -52,5 +57,7 @@ class MyDataset(torch.utils.data.Dataset):
 
 if __name__ == '__main__':
     mydataset = MyDataset()
-    print(len(mydataset))
-    print(mydataset.__getitem__(0))
+    Ia, Pb, Ib = mydataset.__getitem__(0)
+    print(Ia.shape)
+    print(Pb.shape)
+    print(Ib.shape)
