@@ -42,6 +42,9 @@ def return_Pb_Ib(imagePath):    # [Pb, Ib]をリターン　ポーズが取れ�
     print(imagePath)
     datum = op.Datum()
     image = cv2.imread(imagePath)
+    opWrapper = op.WrapperPython()
+    opWrapper.configure(params)
+    opWrapper.start()
     datum.cvInputData = image
     opWrapper.emplaceAndPop([datum])
     try:
