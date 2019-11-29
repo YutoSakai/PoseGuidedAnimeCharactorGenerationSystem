@@ -6,6 +6,7 @@ import torch.backends.cudnn as cudnn
 import torch.optim as optim
 import torch.utils.data
 import torchvision.utils as vutils
+import torch
 from torch.autograd import Variable
 
 from Dataset import MyDataset
@@ -282,15 +283,12 @@ for epoch in range(opt.niterG1):
 
 '''training Adversarial net (G2 and D)'''
 for epoch in range(opt.niterG2):
-    for i, data in enumerate(data_loader, 0):
+    for i, condition_Ia, target_Pb, target_Ib in enumerate(data_loader, 0):
         netG2.zero_grad()
         netD.zero_grad()
 
-        data, label = data
+        label = torch.tensor([real_label for _ in range(condition_Ia.shape[0])])
 
-        condition_Ia = data[:, 0:3, :, :]
-        target_Pb = data[:, 3:21, :, :]
-        target_Ib = data[:, 21:24, :, :]
         if opt.cuda:
             condition_Ia = condition_Ia.cuda()
             target_Pb = target_Pb.cuda()
