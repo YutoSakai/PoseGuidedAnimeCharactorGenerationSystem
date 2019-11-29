@@ -45,7 +45,7 @@ class NetG1(nn.Module):
     def __init__(self):
         super(NetG1, self).__init__()
         # input bs x 21 x 256 x256
-        self.conv_1 = nn.Conv2d(21, 64, kernel_size=3, stride=1, padding=1)
+        self.conv_1 = nn.Conv2d(28, 64, kernel_size=3, stride=1, padding=1)
         # state bs x 64 x 256 x 256
         self.e_block_1 = ResBlock(64)
         self.conv_2 = nn.Conv2d(64, 128, 3, 2, 1)
