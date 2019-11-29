@@ -241,8 +241,8 @@ netD.apply(weights_init)
 L1_criterion = nn.L1Loss()
 BCE_criterion = nn.BCELoss()
 
-real_label = 1
-fake_label = 0
+real_label = 1.0
+fake_label = 0.0
 
 '''using cuda'''
 if opt.cuda:
@@ -259,7 +259,11 @@ optimizerD = optim.Adam(netD.parameters(), lr=2e-5, betas=(0.5, 0.999))
 
 '''training G1'''
 for epoch in range(opt.niterG1):
-    for i, condition_Ia, target_Pb, target_Ib in enumerate(data_loader, 0):
+    for i, data  in enumerate(data_loader):
+        condition_Ia, target_Pb, target_Ib = data
+        print(condition_Ia.shape)
+        print(target_Pb.shape)
+        print(target_Ib.shape)
         netG1.zero_grad()
         if opt.cuda:
             condition_Ia = condition_Ia.cuda()
@@ -283,7 +287,8 @@ for epoch in range(opt.niterG1):
 
 '''training Adversarial net (G2 and D)'''
 for epoch in range(opt.niterG2):
-    for i, condition_Ia, target_Pb, target_Ib in enumerate(data_loader, 0):
+    for i, data in enumerate(data_loader):
+        condition_Ia, target_Pb, target_Ib = data
         netG2.zero_grad()
         netD.zero_grad()
 

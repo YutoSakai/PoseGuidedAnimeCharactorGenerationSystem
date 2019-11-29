@@ -51,7 +51,7 @@ def return_Pb_Ib(imagePath):    # [Pb, Ib]をリターン　ポーズが取れ�
     opWrapper.emplaceAndPop([datum])
     try:
         int(datum.poseKeypoints)
-        return None
+        return None, None
     except:
         return_img = draw_keypoints(image, datum.poseKeypoints)
         return image, return_img
