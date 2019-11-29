@@ -17,7 +17,7 @@ class MyDataset(torch.utils.data.Dataset):
         for img_path in glob.glob("/img_highres/**/*.jpg", recursive=True):
             self.img_paths.append(img_path)
 
-    def return_data(self, idx):
+    def return_data(self):
         # バッチを読み込むごとに画像データを読み込んでくる
         pair = []
         for img_path in self.img_paths:
@@ -28,12 +28,16 @@ class MyDataset(torch.utils.data.Dataset):
                     continue
                 pair_data = cv2.imread(pair_data_path)
                 pair.append(np.concatenate(pair_data, pbib_data))   # [Ia,Pb,Ib]でコンキャットできたばず　あとは例外処理
+                print("pair appended")
 
 
         if self.transform:
             out_data = self.transform(pbib_data)
 
-        return pbib_data
+        print(pair)
+
+        return pair
 
 
 myDataset = MyDataset()
+pair = myDataset.return_data()
