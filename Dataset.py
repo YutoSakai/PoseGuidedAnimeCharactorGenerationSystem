@@ -20,7 +20,7 @@ class MyDataset(torch.utils.data.Dataset):
             data_dir = os.path.dirname(img_path)
             basename = os.path.basename(img_path)
             id_str = basename.split('_')[0]
-            same_id_paths = [i for i in glob.glob(str(data_dir) + str(id_str) + "*.jpg", recursive=True) if i != img_path]
+            same_id_paths = [i for i in glob.glob(str(data_dir) + "/" + str(id_str) + "*.jpg", recursive=True) if i != img_path]
             for same_id_path in same_id_paths:
                 self.pair.append((img_path, same_id_path))
             # for pair_data_path in os.path.basename(data_dir):
