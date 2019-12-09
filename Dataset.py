@@ -17,7 +17,8 @@ class MyDataset(torch.utils.data.Dataset):
         self.pair = []
         for img_path in self.img_paths:
             # pbib_data = keypoints_from_images.return_keypoints(img_path)  # [Pb,Ib]　あとはIaを前につなげたい
-            keypoints = keypoints_from_images.return_Pb_Ib(img_path)
+            keypoints_estimate = keypoints_from_images.Keypoints_from_images()  #Keypoints_from_imagesクラスをメソッド化
+            keypoints = keypoints_estimate.return_Pb_Ib(img_path)
             if keypoints[0] is None:
                 print("None")
                 continue

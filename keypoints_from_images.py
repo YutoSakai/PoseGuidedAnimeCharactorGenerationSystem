@@ -8,11 +8,11 @@ import argparse
 import time
 import numpy as np
 import glob
-
 sys.path.append('/openpose/build/python')
 from openpose import pyopenpose as op
 
-class OpenPose:
+
+class Keypoints_from_images:
     def __init__(self):
         self.opWrapper = op.WrapperPython()
         self.opWrapper.configure(params)
