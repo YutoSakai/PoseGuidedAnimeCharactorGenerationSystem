@@ -14,6 +14,8 @@ from openpose import pyopenpose as op
 
 class Keypoints_from_images:
     def __init__(self):
+        self.params = dict()
+        self.params["model_folder"] = "/openpose/models/"
         self.opWrapper = op.WrapperPython()
         self.opWrapper.configure(params)
         self.opWrapper.start()
@@ -43,12 +45,9 @@ class Keypoints_from_images:
 
         return return_images
 
-
     def return_Pb_Ib(self, imagePath):    # [Pb, Ib]をリターン　ポーズが取れなかった場合はNoneをリターン
         print(imagePath)
         image = cv2.imread(imagePath)
-        params = dict()
-        params["model_folder"] = "/openpose/models/"
         self.datum.cvInputData = image
         self.opWrapper.emplaceAndPop([self.datum])
         try:
