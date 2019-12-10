@@ -6,6 +6,7 @@ from PIL import Image
 import glob
 import keypoints_from_images
 import cv2
+import subprocess
 
 img_folder_path = "/img_highres"
 
@@ -15,7 +16,7 @@ class MyDataset(torch.utils.data.Dataset):
         self.transform = transform
         self.img_paths = [img_path for img_path in glob.glob("/img_highres/**/*.jpg", recursive=True)]
         self.pair = []
-        self.keypoints_estimate = keypoints_from_images.Keypoints_from_images()  # Keypoints_from_imagesクラスをメソッド化
+        self.keypoints_estimate = keypoints_from_images.Keypoints_from_images()  # Keypoints_from_imagesクラスをインスタンス化
         for img_path in self.img_paths:
             # pbib_data = keypoints_from_images.return_keypoints(img_path)  # [Pb,Ib]　あとはIaを前につなげたい
             keypoints = self.keypoints_estimate.return_Pb_Ib(img_path)
@@ -48,7 +49,7 @@ class MyDataset(torch.utils.data.Dataset):
         Ib_path = self.pair[idx][1]
         print(Ia_path, Ib_path)
         Ia_data = cv2.imread(Ia_path)
-        Ib_data, Pb_data = keypoints_from_images.return_Pb_Ib(Ib_path)
+        Ib_data, Pb_data = self.keypoints_estimate.return_Pb_Ib(Ib_path)
         Pb_data = np.array(Pb_data, dtype=np.float32)
         Ia_data = cv2.resize(Ia_data, (Ib_data.shape[1], Ib_data.shape[0]))
         Pb_data = Pb_data.transpose((1, 2, 0)).astype(np.float32)

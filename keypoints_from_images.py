@@ -19,7 +19,6 @@ class Keypoints_from_images:
         self.opWrapper = op.WrapperPython()
         self.opWrapper.configure(self.params)
         self.opWrapper.start()
-        self.datum = op.Datum()
 
     def draw_keypoints(self, img, humans):
         image_h, image_w = img.shape[:2]
@@ -47,14 +46,15 @@ class Keypoints_from_images:
 
     def return_Pb_Ib(self, imagePath):    # [Pb, Ib]をリターン　ポーズが取れなかった場合はNoneをリターン
         print(imagePath)
+        datum = op.Datum()
         image = cv2.imread(imagePath)
-        self.datum.cvInputData = image
-        self.opWrapper.emplaceAndPop([self.datum])
+        datum.cvInputData = image
+        self.opWrapper.emplaceAndPop([datum])
         try:
-            int(self.datum.poseKeypoints)
+            int(datum.poseKeypoints)
             return None, None
         except:
-            return_img = self.draw_keypoints(image, self.datum.poseKeypoints)
+            return_img = self.draw_keypoints(image, datum.poseKeypoints)
             return image, return_img
 
 
