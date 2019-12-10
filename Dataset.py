@@ -15,10 +15,10 @@ class MyDataset(torch.utils.data.Dataset):
         self.transform = transform
         self.img_paths = [img_path for img_path in glob.glob("/img_highres/**/*.jpg", recursive=True)]
         self.pair = []
+        self.keypoints_estimate = keypoints_from_images.Keypoints_from_images()  # Keypoints_from_imagesクラスをメソッド化
         for img_path in self.img_paths:
             # pbib_data = keypoints_from_images.return_keypoints(img_path)  # [Pb,Ib]　あとはIaを前につなげたい
-            keypoints_estimate = keypoints_from_images.Keypoints_from_images()  #Keypoints_from_imagesクラスをメソッド化
-            keypoints = keypoints_estimate.return_Pb_Ib(img_path)
+            keypoints = self.keypoints_estimate.return_Pb_Ib(img_path)
             if keypoints[0] is None:
                 print("None")
                 continue
