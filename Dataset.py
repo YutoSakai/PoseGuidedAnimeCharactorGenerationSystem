@@ -32,8 +32,8 @@ class MyDataset(torch.utils.data.Dataset):
             same_id_paths = [i for i in glob.glob(str(data_dir) + "/" + str(id_str) + "*.jpg", recursive=True) if i != img_path]
             for same_id_path in same_id_paths:
                 self.pair.append((same_id_path, img_path))
-                if len(self.pair) > 20:
-                    return
+                # if len(self.pair) > 20:
+                #     return
             # for pair_data_path in os.path.basename(data_dir):
             #     if pair_data_path == img_path:
             #         continue
