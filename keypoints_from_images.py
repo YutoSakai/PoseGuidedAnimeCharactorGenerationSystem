@@ -17,7 +17,7 @@ class Keypoints_from_images:
         self.params = dict()
         self.params["model_folder"] = "/openpose/models/"
         self.opWrapper = op.WrapperPython()
-        self.opWrapper.configure(params)
+        self.opWrapper.configure(self.params)
         self.opWrapper.start()
         self.datum = op.Datum()
 
