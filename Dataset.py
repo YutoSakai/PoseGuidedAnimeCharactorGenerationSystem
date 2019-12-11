@@ -24,6 +24,7 @@ class MyDataset(torch.utils.data.Dataset):
                 print("None and delete image in dataset")
                 try:
                     delete_args.append(img_path)
+                    print(delete_args)
                     subprocess.check_call(delete_args)
                     delete_args.pop()
                 except:
