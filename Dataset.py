@@ -9,7 +9,7 @@ import cv2
 import subprocess
 
 img_folder_path = "/img_highres"
-
+delete_args = ['rm']
 
 class MyDataset(torch.utils.data.Dataset):
     def __init__(self, transform=None):
@@ -21,10 +21,22 @@ class MyDataset(torch.utils.data.Dataset):
             # pbib_data = keypoints_from_images.return_keypoints(img_path)  # [Pb,Ib]　あとはIaを前につなげたい
             keypoints = self.keypoints_estimate.return_Pb_Ib(img_path)
             if keypoints[0] is None:
-                print("None")
+                print("None and delete image in dataset")
+                try:
+                    delete_args.append(img_path)
+                    subprocess.check_call(delete_args)
+                    delete_args.pop()
+                except:
+                    print("Can not delete image file.")
                 continue
             if len(keypoints[1]) != 25:
-                print("25以外")
+                print("25以外なので delete image in dataset")
+                try:
+                    delete_args.append(img_path)
+                    subprocess.check_call(delete_args)
+                    delete_args.pop()
+                except:
+                    print("Can not delete image file.")
                 continue
             data_dir = os.path.dirname(img_path)
             basename = os.path.basename(img_path)
