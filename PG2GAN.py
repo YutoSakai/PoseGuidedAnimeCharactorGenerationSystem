@@ -12,7 +12,7 @@ from torch.autograd import Variable
 from Dataset import MyDataset
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--batchSize', type=int, default=10, help='input batch size')
+parser.add_argument('--batchSize', type=int, default=5, help='input batch size')
 parser.add_argument('--niterG1', type=int, default=1, help='number of epochs to train for G1')
 parser.add_argument('--niterG2', type=int, default=10, help='number of epochs to train for G2')
 parser.add_argument('--L1_lambda', type=int, default=1, help='L1_lambda for G2')
