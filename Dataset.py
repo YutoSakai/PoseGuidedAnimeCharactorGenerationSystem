@@ -15,6 +15,7 @@ class MyDataset(torch.utils.data.Dataset):
     def __init__(self, transform=None):
         self.transform = transform
         self.img_paths = [img_path for img_path in glob.glob("/img_highres/**/*.jpg", recursive=True)]
+        print(len(self.img_paths))
         self.pair = []
         self.keypoints_estimate = keypoints_from_images.Keypoints_from_images()  # Keypoints_from_imagesクラスをインスタンス化
         for img_path in self.img_paths:
@@ -53,6 +54,7 @@ class MyDataset(torch.utils.data.Dataset):
             #     pair_data = cv2.imread(pair_data_path)
             #     pair.append(np.concatenate(pair_data, pbib_data))   # [Ia,Pb,Ib]でコンキャットできたばず　あとは例外処理
             #     print("pair appended")
+            # print(len(self.pair))
 
     def __len__(self):
         return len(self.pair)
