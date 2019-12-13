@@ -44,49 +44,51 @@ class NetG1(nn.Module):
     """Generator at stage-1 (G1)"""
     def __init__(self):
         super(NetG1, self).__init__()
-        # input bs x 21 x 256 x256
-        self.conv_1 = nn.Conv2d(28, 64, kernel_size=3, stride=1, padding=1)
+        self.dim_list = [28, 64, 128, 256, 384, 512, 640, 64]
+        # [入力, 1層目, 2層目, 3層目, 4層目, 5層目, 6層目, 全結合層]
+        # input bs x 28 x 256 x256
+        self.conv_1 = nn.Conv2d(self.dim_list[0], self.dim_list[1], kernel_size=3, stride=1, padding=1)
         # state bs x 64 x 256 x 256
-        self.e_block_1 = ResBlock(64)
-        self.conv_2 = nn.Conv2d(64, 128, 3, 2, 1)
+        self.e_block_1 = ResBlock(self.dim_list[1])
+        self.conv_2 = nn.Conv2d(self.dim_list[1], self.dim_list[2], 3, 2, 1)
         # state bs x 128 x 128 x128
-        self.e_block_2 = ResBlock(128)
-        self.conv_3 = nn.Conv2d(128, 256, 3, 2, 1)
+        self.e_block_2 = ResBlock(self.dim_list[2])
+        self.conv_3 = nn.Conv2d(self.dim_list[2], self.dim_list[3], 3, 2, 1)
         # state bs x 256 x 64 x64
-        self.e_block_3 = ResBlock(256)
-        self.conv_4 = nn.Conv2d(256, 384, 3, 2, 1)
+        self.e_block_3 = ResBlock(self.dim_list[3])
+        self.conv_4 = nn.Conv2d(self.dim_list[3], self.dim_list[4], 3, 2, 1)
         # state bs x 384 x 32 x32
-        self.e_block_4 = ResBlock(384)
-        self.conv_5 = nn.Conv2d(384, 512, 3, 2, 1)
+        self.e_block_4 = ResBlock(self.dim_list[4])
+        self.conv_5 = nn.Conv2d(self.dim_list[4], self.dim_list[5], 3, 2, 1)
         # state bs x 512 x 16 x16
-        self.e_block_5 = ResBlock(512)
-        self.conv_6 = nn.Conv2d(512, 640, 3, 2, 1)
+        self.e_block_5 = ResBlock(self.dim_list[5])
+        self.conv_6 = nn.Conv2d(self.dim_list[5], self.dim_list[6], 3, 2, 1)
         # state bs x 640 x 8 x 8
-        self.e_block_6 = ResBlock(640)
-        self.conv_7 = nn.Conv2d(640, 640, 3, 1, 1)
+        self.e_block_6 = ResBlock(self.dim_list[6])
+        self.conv_7 = nn.Conv2d(self.dim_list[6], self.dim_list[6], 3, 1, 1)
         # state bs x 1280 x 8 x 8
         # have to do view
-        self.fc_1 = nn.Linear(640 * 8 * 8, 64)
-        self.fc_2 = nn.Linear(64, 640 * 8 * 8)
+        self.fc_1 = nn.Linear(self.dim_list[6] * 8 * 8, self.dim_list[7])
+        self.fc_2 = nn.Linear(self.dim_list[7], self.dim_list[6] * 8 * 8)
         # have to do view
         # state bs x 1280 x 8x 8
-        self.de_block_1 = ResBlock(640)
-        self.deconv_1 = nn.ConvTranspose2d(640, 512, kernel_size=3, stride=2, padding=1)
+        self.de_block_1 = ResBlock(self.dim_list[6])
+        self.deconv_1 = nn.ConvTranspose2d(self.dim_list[6], self.dim_list[5], kernel_size=3, stride=2, padding=1)
         # state bs x 640 x 16 x 16
-        self.de_block_2 = ResBlock(512)
-        self.deconv_2 = nn.ConvTranspose2d(512, 384, kernel_size=3, stride=2, padding=1)
+        self.de_block_2 = ResBlock(self.dim_list[5])
+        self.deconv_2 = nn.ConvTranspose2d(self.dim_list[5], self.dim_list[4], kernel_size=3, stride=2, padding=1)
         # state bs x 512 x 32 x 32
-        self.de_block_3 = ResBlock(384)
-        self.deconv_3 = nn.ConvTranspose2d(384, 256, kernel_size=3, stride=2, padding=1)
+        self.de_block_3 = ResBlock(self.dim_list[4])
+        self.deconv_3 = nn.ConvTranspose2d(self.dim_list[4], self.dim_list[3], kernel_size=3, stride=2, padding=1)
         # state bs x 384 x 64 x64
-        self.de_block_4 = ResBlock(256)
-        self.deconv_4 = nn.ConvTranspose2d(256, 128, kernel_size=3, stride=2, padding=1)
+        self.de_block_4 = ResBlock(self.dim_list[3])
+        self.deconv_4 = nn.ConvTranspose2d(self.dim_list[3], self.dim_list[2], kernel_size=3, stride=2, padding=1)
         # state bs x 256 x 128 x 128
-        self.de_block_5 = ResBlock(128)
-        self.deconv_5 = nn.ConvTranspose2d(128, 64, kernel_size=3, stride=2, padding=1)
+        self.de_block_5 = ResBlock(self.dim_list[2])
+        self.deconv_5 = nn.ConvTranspose2d(self.dim_list[2], self.dim_list[1], kernel_size=3, stride=2, padding=1)
         # state bs x 128 x 256 x 256
-        self.de_block_6 = ResBlock(64)
-        self.deconv_6 = nn.ConvTranspose2d(64, 3, kernel_size=3, stride=1, padding=1)
+        self.de_block_6 = ResBlock(self.dim_list[1])
+        self.deconv_6 = nn.ConvTranspose2d(self.dim_list[1], 3, kernel_size=3, stride=1, padding=1)
         # state bs x 3 x 256 x 256
 
     def forward(self, x):
@@ -99,9 +101,9 @@ class NetG1(nn.Module):
         out_from_e_6 = self.e_block_6(self.conv_6(out_from_e_5))
         out_from_e = self.conv_7(out_from_e_6)
         # view and fullchain
-        out_from_e = out_from_e.view(-1, 640 * 8 * 8)
+        out_from_e = out_from_e.view(-1, self.dim_list[6] * 8 * 8)
         out_from_fc = self.fc_2(self.fc_1(out_from_e))
-        out_from_fc = out_from_fc.view(-1, 640, 8, 8)
+        out_from_fc = out_from_fc.view(-1, self.dim_list[6], 8, 8)
         # decording and skip connection
         # input bs x 1280 x 8 x 8
         out_from_de_1 = self.deconv_1(self.de_block_1(out_from_fc + out_from_e_6), output_size=out_from_e_5.size())
@@ -220,7 +222,7 @@ class NetD(nn.Module):
 
 
 def weights_init(m):
-    """custom weights initialization called on netG and netD"""
+    """custom weights initialization called on netG and netD"""     # なくてもいい
     class_name = m.__class__.__name__
     if class_name.find('Conv') != -1:
         m.weight.data.normal_(0.0, 0.02)
@@ -300,7 +302,7 @@ for epoch in range(opt.niterG2):
             target_Ib = target_Ib.cuda()
             label = label.cuda()
 
-        input_G1 = torch.cat((condition_Ia, target_Pb), 1)  # input_G1 bs x 21 x 256 x256
+        input_G1 = torch.cat((condition_Ia, target_Pb), 1)  # input_G1 bs x 28 x 256 x256
         pred_Ib = netG1(input_G1).detach()
 
         input_G2 = torch.cat((condition_Ia, pred_Ib), 1)  # input_G2 bs x 6 x 256 x256

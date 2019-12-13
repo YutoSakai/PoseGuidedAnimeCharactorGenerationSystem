@@ -44,7 +44,7 @@ class Keypoints_from_images:
 
         return return_images
 
-    def return_Pb_Ib(self, imagePath):    # [Pb, Ib]をリターン　ポーズが取れなかった場合はNoneをリターン
+    def return_Ib_Pb(self, imagePath):    # [Pb, Ib]をリターン　ポーズが取れなかった場合はNoneをリターン
         # print(imagePath)
         datum = op.Datum()
         image = cv2.imread(imagePath)

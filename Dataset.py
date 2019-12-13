@@ -64,7 +64,7 @@ class MyDataset(torch.utils.data.Dataset):
         Ib_path = self.pair[idx][1]
         print(Ia_path, Ib_path)
         Ia_data = cv2.imread(Ia_path)
-        Ib_data, Pb_data = self.keypoints_estimate.return_Pb_Ib(Ib_path)
+        Ib_data, Pb_data = self.keypoints_estimate.return_Ib_Pb(Ib_path)
         Pb_data = np.array(Pb_data, dtype=np.float32)
         Ia_data = cv2.resize(Ia_data, (Ib_data.shape[1], Ib_data.shape[0]))
         Pb_data = Pb_data.transpose((1, 2, 0)).astype(np.float32)
