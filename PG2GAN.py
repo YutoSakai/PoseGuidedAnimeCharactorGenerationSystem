@@ -263,9 +263,6 @@ optimizerD = optim.Adam(netD.parameters(), lr=2e-5, betas=(0.5, 0.999))
 for epoch in range(opt.niterG1):
     for i, data  in enumerate(data_loader):
         condition_Ia, target_Pb, target_Ib = data
-        print(condition_Ia.shape)
-        print(target_Pb.shape)
-        print(target_Ib.shape)
         netG1.zero_grad()
         if opt.cuda:
             condition_Ia = condition_Ia.cuda()

@@ -3,7 +3,6 @@
 import sys
 import cv2
 import os
-from sys import platform
 import argparse
 import time
 import numpy as np
@@ -24,10 +23,7 @@ class Keypoints_from_images:
         image_h, image_w = img.shape[:2]
         return_images = []
         all_keypoints_img = np.zeros((image_h, image_w), np.uint8)
-        # print(num)
-        # print(humans)
         for i, human in enumerate(humans):
-            # print("human"+str(i))
             for j, keypoint in enumerate(human):
                 black_img = np.zeros((image_h, image_w), np.uint8)
                 if (keypoint[0] == 0) and (keypoint[1] == 0):
@@ -36,11 +32,8 @@ class Keypoints_from_images:
                 # draw point
                 center = (int(keypoint[0]), int(keypoint[1]))
                 return_images.append(cv2.circle(black_img, center, 3, 255, thickness=3, lineType=8, shift=0))
-                # cv2.imwrite("keypoint" + str(num) + "-" + str(i) + "-" + str(j) + ".png", cv2.circle(black_img, center, 3, 255, thickness=3, lineType=8, shift=0))
                 all_keypoints_img = cv2.circle(all_keypoints_img, center, 3, 255, thickness=3, lineType=8, shift=0)
-                # print("all_keypoints_img updated.")
         # cv2.imwrite("keypoint" + str(num) + ".png", all_keypoints_img)
-        # print(len(return_images))
 
         return return_images
 
@@ -60,6 +53,7 @@ class Keypoints_from_images:
 
 if __name__ == '__main__':
 
+    keypoints_estimate = Keypoints_from_images()
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
     # Flags
@@ -111,7 +105,7 @@ if __name__ == '__main__':
                 int(datum.poseKeypoints)
                 continue
             except:
-                return_img = draw_keypoints(imageToProcess, datum.poseKeypoints, num)
+                return_img = keypoints_estimate.draw_keypoints(imageToProcess, datum.poseKeypoints)
                 np.save(imagePath[:-4] + "_keypoints", return_img)
                 # print("Body keypoints: \n" + str(datum.poseKeypoints))
 

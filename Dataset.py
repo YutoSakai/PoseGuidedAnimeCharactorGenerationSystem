@@ -11,15 +11,15 @@ import subprocess
 img_folder_path = "/img_highres"
 delete_args = ['rm']
 
+
 class MyDataset(torch.utils.data.Dataset):
     def __init__(self, transform=None):
         self.transform = transform
         self.img_paths = [img_path for img_path in glob.glob("/img_highres/**/*.jpg", recursive=True)]
-        print(len(self.img_paths))
         self.pair = []
         self.keypoints_estimate = keypoints_from_images.Keypoints_from_images()  # Keypoints_from_imagesクラスをインスタンス化
         for img_path in self.img_paths:
-            # pbib_data = keypoints_from_images.return_keypoints(img_path)  # [Pb,Ib]　あとはIaを前につなげたい
+            # pbib_data = keypoints_from_images.return_keypoints(img_path)  # 姿勢推定出来ないデータセットを削除する際使用
             # keypoints = self.keypoints_estimate.return_Pb_Ib(img_path)
             # if keypoints[0] is None:
             #     print("None and delete image in dataset")
@@ -46,15 +46,6 @@ class MyDataset(torch.utils.data.Dataset):
             same_id_paths = [i for i in glob.glob(str(data_dir) + "/" + str(id_str) + "*.jpg", recursive=True) if i != img_path]
             for same_id_path in same_id_paths:
                 self.pair.append((same_id_path, img_path))
-                # if len(self.pair) > 20:
-                #     return
-            # for pair_data_path in os.path.basename(data_dir):
-            #     if pair_data_path == img_path:
-            #         continue
-            #     pair_data = cv2.imread(pair_data_path)
-            #     pair.append(np.concatenate(pair_data, pbib_data))   # [Ia,Pb,Ib]でコンキャットできたばず　あとは例外処理
-            #     print("pair appended")
-            # print(len(self.pair))
 
     def __len__(self):
         return len(self.pair)
@@ -62,7 +53,7 @@ class MyDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         Ia_path = self.pair[idx][0]
         Ib_path = self.pair[idx][1]
-        print(Ia_path, Ib_path)
+        # print(Ia_path, Ib_path)
         Ia_data = cv2.imread(Ia_path)
         Ib_data, Pb_data = self.keypoints_estimate.return_Ib_Pb(Ib_path)
         Pb_data = np.array(Pb_data, dtype=np.float32)
