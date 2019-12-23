@@ -93,5 +93,3 @@ if __name__ == '__main__':
                       normalize=True)
     vutils.save_image(torch.from_numpy(Ib), 'out/Ib_test.png',
                       normalize=True)
-    vutils.save_image(torch.from_numpy(Pb), 'out/Pb_test.png',
-                      normalize=True)
