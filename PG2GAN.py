@@ -342,7 +342,7 @@ for epoch in range(opt.niterG2):
 
         optimizerG2.step()
 
-        if i % 100 == 0:
+        if i % 1 == 0:
             print(f'[{epoch:2d}/{opt.niterG2:2d}][{i:2d}/{len(data_loader):2d}] '
                   f'Loss_G2: {errG2.item():.4f} '
                   f'Loss_G2BCE: {errG2BCE.item():.4f} '
