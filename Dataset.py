@@ -95,5 +95,5 @@ if __name__ == '__main__':
                       normalize=True)
     Ia = Ia.transpose((1, 2, 0)).astype(np.float32)
     Ib = Ib.transpose((1, 2, 0)).astype(np.float32)
-    cv2.imwrite('out/Ia_cv2_test.png', Ia)
-    cv2.imwrite('out/Ib_cv2_test.png', Ib)
+    cv2.imwrite('out/Ia_cv2_test.png', Ia*255)
+    cv2.imwrite('out/Ib_cv2_test.png', Ib*255)
