@@ -13,7 +13,7 @@ from Dataset import MyDataset
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--batchSize', type=int, default=5, help='input batch size')
-parser.add_argument('--niterG1', type=int, default=1, help='number of epochs to train for G1')
+parser.add_argument('--niterG1', type=int, default=10, help='number of epochs to train for G1')
 parser.add_argument('--niterG2', type=int, default=10, help='number of epochs to train for G2')
 parser.add_argument('--L1_lambda', type=int, default=1, help='L1_lambda for G2')
 parser.add_argument('--cuda', action='store_true', help='enables cuda')
@@ -32,6 +32,7 @@ if opt.cuda:
 
 data_set = MyDataset()
 data_loader = torch.utils.data.DataLoader(data_set, batch_size=opt.batchSize, shuffle=True)
+print(len(data_set))
 
 
 cudnn.benchmark = True
@@ -263,7 +264,6 @@ optimizerD = optim.Adam(netD.parameters(), lr=2e-5, betas=(0.5, 0.999))
 for epoch in range(opt.niterG1):
     print("epoch = " + str(epoch))
     for i, data in enumerate(data_loader):
-        print(str(i) + "*5 kome")
         condition_Ia, target_Pb, target_Ib = data
         netG1.zero_grad()
         if opt.cuda:
@@ -280,6 +280,10 @@ for epoch in range(opt.niterG1):
             print('[%d/%d][%d/%d] Loss_G1: %.4f' % (epoch, opt.niterG1, i, len(data_loader), errG1.data.item()))
 
     if epoch % 1 == 0:
+        vutils.save_image(condition_Ia, 'out/condition_Ia_trainingG2_epoch_%03d.png' % epoch,
+                          normalize=True)
+        vutils.save_image(target_Ib, 'out/target_Ib_trainingG2_epoch_%03d.png' % epoch,
+                          normalize=True)
         vutils.save_image(pred_Ib, 'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
     # do checkpointing
@@ -312,10 +316,7 @@ for epoch in range(opt.niterG2):
 
         # train D with pairs
         output_real = netD(real_pair)
-        print(output_real)
         output_real = torch.squeeze(output_real, 1)
-        print(output_real)
-        print(label)
         errD_real = BCE_criterion(output_real, label)
         errD_real.backward()
 
@@ -341,6 +342,10 @@ for epoch in range(opt.niterG2):
             print('[%d/%d][%d/%d] Loss_G2: %.4f' % (epoch, opt.niterG2, i, len(data_loader), errG2.data.item()))
 
     if epoch % 1 == 0:
+        vutils.save_image(condition_Ia, 'out/condition_Ia_trainingG2_epoch_%03d.png' % epoch,
+                          normalize=True)
+        vutils.save_image(target_Ib, 'out/target_Ib_trainingG2_epoch_%03d.png' % epoch,
+                          normalize=True)
         vutils.save_image(refined_pred_Ib, 'out/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
                           normalize=True)
 
