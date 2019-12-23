@@ -280,9 +280,9 @@ for epoch in range(opt.niterG1):
             print('[%d/%d][%d/%d] Loss_G1: %.4f' % (epoch, opt.niterG1, i, len(data_loader), errG1.data.item()))
 
     if epoch % 1 == 0:
-        vutils.save_image(condition_Ia, 'out/condition_Ia_trainingG2_epoch_%03d.png' % epoch,
+        vutils.save_image(condition_Ia, 'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
-        vutils.save_image(target_Ib, 'out/target_Ib_trainingG2_epoch_%03d.png' % epoch,
+        vutils.save_image(target_Ib, 'out/target_Ib_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
         vutils.save_image(pred_Ib, 'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
