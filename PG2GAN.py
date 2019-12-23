@@ -312,6 +312,7 @@ for epoch in range(opt.niterG2):
 
         # train D with pairs
         output_real = netD(real_pair)
+        print(output_real)
         output_real = torch.squeeze(output_real)
         print(output_real)
         print(label)
@@ -321,8 +322,6 @@ for epoch in range(opt.niterG2):
         output_fake = netD(fake_pair.detach())  # detach
         output_fake = torch.squeeze(output_fake)
         label.data.fill_(fake_label)
-        print(output_fake)
-        print(label)
         errD_fake = BCE_criterion(output_fake, label)
         errD_fake.backward()
 
@@ -332,8 +331,6 @@ for epoch in range(opt.niterG2):
         output_fake = netD(fake_pair)
         output_fake = torch.squeeze(output_fake)
         label.data.fill_(real_label)  # fake labels are real for generator cost
-        print(output_fake)
-        print(label)
         errG2 = BCE_criterion(output_fake, label)
         errG2 += opt.L1_lambda * L1_criterion(refined_pred_Ib, target_Ib)
         errG2.backward()
