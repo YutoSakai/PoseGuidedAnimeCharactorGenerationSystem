@@ -277,14 +277,14 @@ for epoch in range(opt.niterG1):
 
         if i % 10 == 0:
             print(f'[{epoch:2d}/{opt.niterG1:2d}][{i:2d}/{len(data_loader):2d}] '
-                  f'Loss_G1: {errG1.data.item():.4f}')
+                  f'Loss_G1: {errG1.data.item():7.4f}')
 
     if epoch % 1 == 0:
-        vutils.save_image(condition_Ia, 'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
+        vutils.save_image(condition_Ia*255, 'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
-        vutils.save_image(target_Ib, 'out/target_Ib_trainingG1_epoch_%03d.png' % epoch,
+        vutils.save_image(target_Ib*255, 'out/target_Ib_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
-        vutils.save_image(pred_Ib, 'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
+        vutils.save_image(pred_Ib*255, 'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
     # do checkpointing
     if epoch % 1 == 0:
@@ -309,7 +309,7 @@ for epoch in range(opt.niterG2):
         pred_Ib = netG1(input_G1).detach()
 
         input_G2 = torch.cat((condition_Ia, pred_Ib), 1)  # input_G2 bs x 6 x 256 x256
-        refined_pred_Ib = netG2(input_G2)
+        refined_pred_Ib = pred_Ib + netG2(input_G2)
 
         real_pair = torch.cat((condition_Ia, target_Ib), 1)  # input_D bs x 6 x256 x 256
         fake_pair = torch.cat((condition_Ia, refined_pred_Ib), 1)  # input_D bs x 6 x256 x 256
@@ -344,18 +344,18 @@ for epoch in range(opt.niterG2):
 
         if i % 1 == 0:
             print(f'[{epoch:2d}/{opt.niterG2:2d}][{i:2d}/{len(data_loader):2d}] '
-                  f'Loss_G2: {errG2.item():.4f} '
-                  f'Loss_G2BCE: {errG2BCE.item():.4f} '
-                  f'Loss_G2L1: {errG2L1.item():.4f} '
-                  f'Loss_D_real: {errD_real.item():.4f}'
-                  f'Loss_D_fake: {errD_fake.item():.4f}')
+                  f'Loss_G2: {errG2.item():.24f} '
+                  f'Loss_G2BCE: {errG2BCE.item():7.4f} '
+                  f'Loss_G2L1: {errG2L1.item():7.4f} '
+                  f'Loss_D_real: {errD_real.item():7.4f} '
+                  f'Loss_D_fake: {errD_fake.item():7.4f} ')
 
     if epoch % 1 == 0:
-        vutils.save_image(condition_Ia, 'out/condition_Ia_trainingG2_epoch_%03d.png' % epoch,
+        vutils.save_image(condition_Ia*255, 'out/condition_Ia_trainingG2_epoch_%03d.png' % epoch,
                           normalize=True)
-        vutils.save_image(target_Ib, 'out/target_Ib_trainingG2_epoch_%03d.png' % epoch,
+        vutils.save_image(target_Ib*255, 'out/target_Ib_trainingG2_epoch_%03d.png' % epoch,
                           normalize=True)
-        vutils.save_image(refined_pred_Ib, 'out/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
+        vutils.save_image(refined_pred_Ib*255, 'out/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
                           normalize=True)
 
     # do checkpointing
