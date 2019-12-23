@@ -6,6 +6,7 @@ from PIL import Image
 import glob
 import keypoints_from_images
 import cv2
+import torchvision.utils as vutils
 import subprocess
 
 img_folder_path = "/img_highres"
@@ -88,3 +89,9 @@ if __name__ == '__main__':
     print(Ia.dtype)
     print(Pb.dtype)
     print(Ib.dtype)
+    vutils.save_image(Ia, 'out/Ia_test.png',
+                      normalize=True)
+    vutils.save_image(Ib, 'out/Ib_test.png',
+                      normalize=True)
+    vutils.save_image(Pb, 'out/Pb_test.png',
+                      normalize=True)
