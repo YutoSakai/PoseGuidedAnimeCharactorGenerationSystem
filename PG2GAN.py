@@ -262,7 +262,6 @@ optimizerD = optim.Adam(netD.parameters(), lr=2e-5, betas=(0.5, 0.999))
 
 '''training G1'''
 for epoch in range(opt.niterG1):
-    print("epoch = " + str(epoch))
     for i, data in enumerate(data_loader):
         condition_Ia, target_Pb, target_Ib = data
         netG1.zero_grad()
@@ -277,7 +276,8 @@ for epoch in range(opt.niterG1):
         optimizerG1.step()
 
         if i % 10 == 0:
-            print('[%d/%d][%d/%d] Loss_G1: %.4f' % (epoch, opt.niterG1, i, len(data_loader), errG1.data.item()))
+            print(f'[{epoch:2d}/{opt.niterG1:2d}][{i:2d}/{len(data_loader):2d}] '
+                  f'Loss_G1: {errG1.data.item():.4f}')
 
     if epoch % 1 == 0:
         vutils.save_image(condition_Ia, 'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
