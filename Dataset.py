@@ -89,9 +89,9 @@ if __name__ == '__main__':
     print(Ia.dtype)
     print(Pb.dtype)
     print(Ib.dtype)
-    vutils.save_image(Ia, 'out/Ia_test.png',
+    vutils.save_image(torch.from_numpy(Ia), 'out/Ia_test.png',
                       normalize=True)
-    vutils.save_image(Ib, 'out/Ib_test.png',
+    vutils.save_image(torch.from_numpy(Ib), 'out/Ib_test.png',
                       normalize=True)
-    vutils.save_image(Pb, 'out/Pb_test.png',
+    vutils.save_image(torch.from_numpy(Pb), 'out/Pb_test.png',
                       normalize=True)
