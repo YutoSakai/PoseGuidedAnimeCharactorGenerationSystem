@@ -318,16 +318,14 @@ for epoch in range(opt.niterG2):
         output_real = netD(real_pair)
         output_real = torch.squeeze(output_real, 1)
         errD_real = BCE_criterion(output_real, label)
-        errD_real.backward()
 
         output_fake = netD(fake_pair.detach())  # detach
         output_fake = torch.squeeze(output_fake, 1)
         label.data.fill_(fake_label)
         errD_fake = BCE_criterion(output_fake, label)
-        errD_fake.backward()
 
-        # errD = errD_real + errD_fake
-        # errD.backward()
+        errD = 0 * (errD_real + errD_fake)
+        errD.backward()
 
         optimizerD.step()
 
@@ -344,9 +342,10 @@ for epoch in range(opt.niterG2):
 
         if i % 1 == 0:
             print(f'[{epoch:2d}/{opt.niterG2:2d}][{i:2d}/{len(data_loader):2d}] '
-                  f'Loss_G2: {errG2.item():.24f} '
+                  f'Loss_G2: {errG2.item():7.4f} '
                   f'Loss_G2BCE: {errG2BCE.item():7.4f} '
                   f'Loss_G2L1: {errG2L1.item():7.4f} '
+                  f'Loss_D: {errD.item():7.4f} '
                   f'Loss_D_real: {errD_real.item():7.4f} '
                   f'Loss_D_fake: {errD_fake.item():7.4f} ')
 
