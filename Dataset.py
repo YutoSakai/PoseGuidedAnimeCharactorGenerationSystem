@@ -18,7 +18,7 @@ class MyDataset(torch.utils.data.Dataset):
         self.img_paths = [img_path for img_path in glob.glob("/img_highres/**/*.jpg", recursive=True)]
         self.pair = []
         self.keypoints_estimate = keypoints_from_images.Keypoints_from_images()  # Keypoints_from_imagesクラスをインスタンス化
-        for img_path in self.img_paths:
+        for i, img_path in enumerate(self.img_paths):
             # pbib_data = keypoints_from_images.return_keypoints(img_path)  # 姿勢推定出来ないデータセットを削除する際使用
             # keypoints = self.keypoints_estimate.return_Pb_Ib(img_path)
             # if keypoints[0] is None:
@@ -44,10 +44,10 @@ class MyDataset(torch.utils.data.Dataset):
             basename = os.path.basename(img_path)
             id_str = basename.split('_')[0]
             same_id_paths = [i for i in glob.glob(str(data_dir) + "/" + str(id_str) + "*.jpg", recursive=True) if i != img_path]
-            for i, same_id_path in enumerate(same_id_paths):
+            for same_id_path in same_id_paths:
                 self.pair.append((same_id_path, img_path))
-                if i == 100:
-                    break
+            if i == 100:
+                break
 
     def __len__(self):
         return len(self.pair)
