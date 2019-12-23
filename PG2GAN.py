@@ -261,7 +261,9 @@ optimizerD = optim.Adam(netD.parameters(), lr=2e-5, betas=(0.5, 0.999))
 
 '''training G1'''
 for epoch in range(opt.niterG1):
-    for i, data  in enumerate(data_loader):
+    print("epoch = " + epoch)
+    for i, data in enumerate(data_loader):
+        print(i + "*5 kome")
         condition_Ia, target_Pb, target_Ib = data
         netG1.zero_grad()
         if opt.cuda:
@@ -274,7 +276,7 @@ for epoch in range(opt.niterG1):
         errG1.backward()
         optimizerG1.step()
 
-        if i % 100 == 0:
+        if i % 10 == 0:
             print('[%d/%d][%d/%d] Loss_G1: %.4f' % (epoch, opt.niterG1, i, len(data_loader), errG1.data.item()))
 
     if epoch % 10 == 0:
