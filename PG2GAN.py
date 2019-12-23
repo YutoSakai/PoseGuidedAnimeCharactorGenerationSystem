@@ -326,20 +326,29 @@ for epoch in range(opt.niterG2):
         errD_fake = BCE_criterion(output_fake, label)
         errD_fake.backward()
 
+        # errD = errD_real + errD_fake
+        # errD.backward()
+
         optimizerD.step()
 
         # train G with pairs
         output_fake = netD(fake_pair)
         output_fake = torch.squeeze(output_fake, 1)
         label.data.fill_(real_label)  # fake labels are real for generator cost
-        errG2 = BCE_criterion(output_fake, label)
-        errG2 += opt.L1_lambda * L1_criterion(refined_pred_Ib, target_Ib)
+        errG2BCE = BCE_criterion(output_fake, label)
+        errG2L1 = L1_criterion(refined_pred_Ib, target_Ib)
+        errG2 = errG2BCE + opt.L1_lambda * errG2L1
         errG2.backward()
 
         optimizerG2.step()
 
         if i % 100 == 0:
-            print('[%d/%d][%d/%d] Loss_G2: %.4f' % (epoch, opt.niterG2, i, len(data_loader), errG2.data.item()))
+            print(f'[{epoch:2d}/{opt.niterG2:2d}][{i:2d}/{len(data_loader):2d}] '
+                  f'Loss_G2: {errG2.item():.4f} '
+                  f'Loss_G2BCE: {errG2BCE.item():.4f} '
+                  f'Loss_G2L1: {errG2L1.item():.4f} '
+                  f'Loss_D_real: {errD_real.item():.4f}'
+                  f'Loss_D_fake: {errD_fake.item():.4f}')
 
     if epoch % 1 == 0:
         vutils.save_image(condition_Ia, 'out/condition_Ia_trainingG2_epoch_%03d.png' % epoch,
