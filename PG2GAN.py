@@ -279,11 +279,11 @@ for epoch in range(opt.niterG1):
         if i % 10 == 0:
             print('[%d/%d][%d/%d] Loss_G1: %.4f' % (epoch, opt.niterG1, i, len(data_loader), errG1.data.item()))
 
-    if epoch % 10 == 0:
+    if epoch % 1 == 0:
         vutils.save_image(pred_Ib, 'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
     # do checkpointing
-    if epoch % 100 == 0:
+    if epoch % 1 == 0:
         torch.save(netG1.state_dict(), 'outpth/netG1_epoch_%d.pth' % epoch)
 
 '''training Adversarial net (G2 and D)'''
@@ -337,11 +337,11 @@ for epoch in range(opt.niterG2):
         if i % 100 == 0:
             print('[%d/%d][%d/%d] Loss_G2: %.4f' % (epoch, opt.niterG2, i, len(data_loader), errG2.data.item()))
 
-    if epoch % 10 == 0:
+    if epoch % 1 == 0:
         vutils.save_image(refined_pred_Ib, 'out/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
                           normalize=True)
 
     # do checkpointing
-    if epoch % 100 == 0:
+    if epoch % 1 == 0:
         torch.save(netG2.state_dict(), 'outpth/netG2_epoch_%d.pth' % epoch)
         torch.save(netD.state_dict(), 'outpth/netD_epoch_%d.pth' % epoch)
