@@ -288,11 +288,11 @@ for epoch in range(opt.niterG1):
         #             cv2.cvtColor(target_Ib, cv2.COLOR_RGB2BGR))
         # cv2.imwrite(f'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
         #             cv2.cvtColor(pred_Ib, cv2.COLOR_RGB2BGR))
-        vutils.save_image(condition_Ia[:, [2, 1, 0], :, :], 'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
+        vutils.save_image(condition_Ia[:, [2, 1, 0], :, :], 'out_lossD_0.5/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
-        vutils.save_image(target_Ib[:, [2, 1, 0], :, :], 'out/target_Ib_trainingG1_epoch_%03d.png' % epoch,
+        vutils.save_image(target_Ib[:, [2, 1, 0], :, :], 'out_lossD_0.5/target_Ib_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
-        vutils.save_image(pred_Ib[:, [2, 1, 0], :, :], 'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
+        vutils.save_image(pred_Ib[:, [2, 1, 0], :, :], 'out_lossD_0.5/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
     # do checkpointing
     if epoch % 1 == 0:
@@ -361,11 +361,11 @@ for epoch in range(opt.niterG2):
         # cv2.imwrite(f'out/condition_Ia_trainingG2_epoch_%03d.png' % epoch, condition_Ia)
         # cv2.imwrite(f'out/target_Ib_trainingG2_epoch_%03d.png' % epoch, target_Ib)
         # cv2.imwrite(f'out/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch, refined_pred_Ib)
-        vutils.save_image(condition_Ia[:, [2, 1, 0], :, :], 'out/condition_Ia_trainingG2_epoch_%03d.png' % epoch,
+        vutils.save_image(condition_Ia[:, [2, 1, 0], :, :], 'out_lossD_0.5/condition_Ia_trainingG2_epoch_%03d.png' % epoch,
                           normalize=True)
-        vutils.save_image(target_Ib[:, [2, 1, 0], :, :], 'out/target_Ib_trainingG2_epoch_%03d.png' % epoch,
+        vutils.save_image(target_Ib[:, [2, 1, 0], :, :], 'out_lossD_0.5/target_Ib_trainingG2_epoch_%03d.png' % epoch,
                           normalize=True)
-        vutils.save_image(refined_pred_Ib[:, [2, 1, 0], :, :], 'out/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
+        vutils.save_image(refined_pred_Ib[:, [2, 1, 0], :, :], 'out_lossD0.5/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
                           normalize=True)
 
     # do checkpointing
