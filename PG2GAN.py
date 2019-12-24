@@ -364,15 +364,15 @@ for epoch in range(opt.niterG2):
                   f'Loss_D_fake: {errD_fake.item():7.4f} ')
 
     if epoch % 1 == 0:
-        cv2.imwrite(f'out/condition_Ia_trainingG2_epoch_%03d.png' % epoch, condition_Ia)
-        cv2.imwrite(f'out/target_Ib_trainingG2_epoch_%03d.png' % epoch, target_Ib)
-        cv2.imwrite(f'out/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch, refined_pred_Ib)
-        # vutils.save_image(condition_Ia*255, 'out/condition_Ia_trainingG2_epoch_%03d.png' % epoch,
-        #                   normalize=True)
-        # vutils.save_image(target_Ib*255, 'out/target_Ib_trainingG2_epoch_%03d.png' % epoch,
-        #                   normalize=True)
-        # vutils.save_image(refined_pred_Ib*255, 'out/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
-        #                   normalize=True)
+        # cv2.imwrite(f'out/condition_Ia_trainingG2_epoch_%03d.png' % epoch, condition_Ia)
+        # cv2.imwrite(f'out/target_Ib_trainingG2_epoch_%03d.png' % epoch, target_Ib)
+        # cv2.imwrite(f'out/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch, refined_pred_Ib)
+        vutils.save_image(condition_Ia[:, [2, 1, 0], :, :], 'out/condition_Ia_trainingG2_epoch_%03d.png' % epoch,
+                          normalize=True)
+        vutils.save_image(target_Ib[:, [2, 1, 0], :, :], 'out/target_Ib_trainingG2_epoch_%03d.png' % epoch,
+                          normalize=True)
+        vutils.save_image(refined_pred_Ib[:, [2, 1, 0], :, :], 'out/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
+                          normalize=True)
 
     # do checkpointing
     if epoch % 1 == 0:
