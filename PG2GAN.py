@@ -282,18 +282,21 @@ for epoch in range(opt.niterG1):
                   f'Loss_G1: {errG1.data.item():7.4f}')
 
     if epoch % 1 == 0:
-        # cv2.imwrite(f'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch, condition_Ia)
-        # cv2.imwrite(f'out/target_Ib_trainingG1_epoch_%03d.png' % epoch, target_Ib)
-        # cv2.imwrite(f'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch, pred_Ib)
-        print(condition_Ia.shape)
-        print(target_Ib.shape)
-        print(pred_Ib.shape)
-        vutils.save_image(cv2.cvtColor(condition_Ia, cv2.COLOR_RGB2BGR), 'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
-                          normalize=True)
-        vutils.save_image(cv2.cvtColor(target_Ib, cv2.COLOR_RGB2BGR), 'out/target_Ib_trainingG1_epoch_%03d.png' % epoch,
-                          normalize=True)
-        vutils.save_image(cv2.cvtColor(pred_Ib, cv2.COLOR_RGB2BGR), 'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
-                          normalize=True)
+        cv2.imwrite(f'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
+                    cv2.cvtColor(condition_Ia, cv2.COLOR_RGB2BGR))
+        cv2.imwrite(f'out/target_Ib_trainingG1_epoch_%03d.png' % epoch,
+                    cv2.cvtColor(target_Ib, cv2.COLOR_RGB2BGR))
+        cv2.imwrite(f'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
+                    cv2.cvtColor(pred_Ib, cv2.COLOR_RGB2BGR))
+        # print(condition_Ia.shape)
+        # print(target_Ib.shape)
+        # print(pred_Ib.shape)
+        # vutils.save_image(cv2.cvtColor(condition_Ia, cv2.COLOR_RGB2BGR), 'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
+        #                   normalize=True)
+        # vutils.save_image(cv2.cvtColor(target_Ib, cv2.COLOR_RGB2BGR), 'out/target_Ib_trainingG1_epoch_%03d.png' % epoch,
+        #                   normalize=True)
+        # vutils.save_image(cv2.cvtColor(pred_Ib, cv2.COLOR_RGB2BGR), 'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
+        #                   normalize=True)
     # do checkpointing
     if epoch % 1 == 0:
         torch.save(netG1.state_dict(), 'outpth/netG1_epoch_%d.pth' % epoch)
