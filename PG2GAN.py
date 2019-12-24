@@ -285,11 +285,11 @@ for epoch in range(opt.niterG1):
         # cv2.imwrite(f'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch, condition_Ia)
         # cv2.imwrite(f'out/target_Ib_trainingG1_epoch_%03d.png' % epoch, target_Ib)
         # cv2.imwrite(f'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch, pred_Ib)
-        vutils.save_image(condition_Ia.transpose((0, 3, 1, 2)), 'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
+        vutils.save_image(condition_Ia.transpose((2, 0, 1)), 'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
-        vutils.save_image(target_Ib.transpose((0, 3, 1, 2)), 'out/target_Ib_trainingG1_epoch_%03d.png' % epoch,
+        vutils.save_image(target_Ib.transpose((2, 0, 1)), 'out/target_Ib_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
-        vutils.save_image(pred_Ib.transpose((0, 3, 1, 2)), 'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
+        vutils.save_image(pred_Ib.transpose((2, 0, 1)), 'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
     # do checkpointing
     if epoch % 1 == 0:
