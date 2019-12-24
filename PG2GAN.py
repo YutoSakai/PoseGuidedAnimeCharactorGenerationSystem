@@ -288,12 +288,6 @@ for epoch in range(opt.niterG1):
         #             cv2.cvtColor(target_Ib, cv2.COLOR_RGB2BGR))
         # cv2.imwrite(f'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
         #             cv2.cvtColor(pred_Ib, cv2.COLOR_RGB2BGR))
-        print(condition_Ia.shape)
-        print(target_Ib.shape)
-        print(pred_Ib.shape)
-        print(condition_Ia[:, [2, 1, 0], :, :].shape)
-        print(target_Ib[:, [2, 1, 0], :, :].shape)
-        print(pred_Ib[:, [2, 1, 0], :, :].shape)
         vutils.save_image(condition_Ia[:, [2, 1, 0], :, :], 'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
         vutils.save_image(target_Ib[:, [2, 1, 0], :, :], 'out/target_Ib_trainingG1_epoch_%03d.png' % epoch,
