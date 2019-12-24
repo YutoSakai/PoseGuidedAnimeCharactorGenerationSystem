@@ -8,6 +8,7 @@ import torch.utils.data
 import torchvision.utils as vutils
 import torch
 import cv2
+import numpy as np
 from torch.autograd import Variable
 
 from Dataset import MyDataset
@@ -281,15 +282,15 @@ for epoch in range(opt.niterG1):
                   f'Loss_G1: {errG1.data.item():7.4f}')
 
     if epoch % 1 == 0:
-        cv2.imwrite(f'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch, condition_Ia)
-        cv2.imwrite(f'out/target_Ib_trainingG1_epoch_%03d.png' % epoch, target_Ib)
-        cv2.imwrite(f'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch, pred_Ib)
-        # vutils.save_image(condition_Ia*255, 'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
-        #                   normalize=True)
-        # vutils.save_image(target_Ib*255, 'out/target_Ib_trainingG1_epoch_%03d.png' % epoch,
-        #                   normalize=True)
-        # vutils.save_image(pred_Ib*255, 'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
-        #                   normalize=True)
+        # cv2.imwrite(f'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch, condition_Ia)
+        # cv2.imwrite(f'out/target_Ib_trainingG1_epoch_%03d.png' % epoch, target_Ib)
+        # cv2.imwrite(f'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch, pred_Ib)
+        vutils.save_image(np.transpose(condition_Ia, [0, 3, 1, 2]), 'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
+                          normalize=True)
+        vutils.save_image(np.transpose(target_Ib, [0, 3, 1, 2]), 'out/target_Ib_trainingG1_epoch_%03d.png' % epoch,
+                          normalize=True)
+        vutils.save_image(np.transpose(pred_Ib, [0, 3, 1, 2]), 'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
+                          normalize=True)
     # do checkpointing
     if epoch % 1 == 0:
         torch.save(netG1.state_dict(), 'outpth/netG1_epoch_%d.pth' % epoch)
