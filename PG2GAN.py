@@ -332,7 +332,7 @@ for epoch in range(opt.niterG2):
         label.data.fill_(fake_label)
         errD_fake = BCE_criterion(output_fake, label)
 
-        errD = 0 * (errD_real + errD_fake)
+        errD = 1 * (errD_real + errD_fake)
         errD.backward()
 
         optimizerD.step()
