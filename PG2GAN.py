@@ -365,7 +365,7 @@ for epoch in range(opt.niterG2):
                           normalize=True)
         vutils.save_image(target_Ib[:, [2, 1, 0], :, :], 'out_lossD_0.5/target_Ib_trainingG2_epoch_%03d.png' % epoch,
                           normalize=True)
-        vutils.save_image(refined_pred_Ib[:, [2, 1, 0], :, :], 'out_lossD0.5/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
+        vutils.save_image(refined_pred_Ib[:, [2, 1, 0], :, :], 'out_lossD_0.5/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
                           normalize=True)
 
     # do checkpointing
