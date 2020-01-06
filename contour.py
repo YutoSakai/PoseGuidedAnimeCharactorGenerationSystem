@@ -7,7 +7,7 @@ import numpy as np
 # Saving images path
 IMAGES_PATH = 'imagedir/'
 # Original image name
-IMAGE_NAME = '47000.jpg'
+IMAGE_NAME = 'teacher.png'
 # A path to the original image
 IMAGE_PATH = IMAGES_PATH + IMAGE_NAME
 

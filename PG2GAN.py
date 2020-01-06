@@ -217,7 +217,7 @@ class NetD(nn.Module):
             nn.LeakyReLU(0.2),
             # state bs x (ndf) x 4 x 4
             nn.Conv2d(ndf * 32, 1, 4, 1, 0, bias=False),
-            nn.Sigmoid()
+            nn.Tanh()
         )
 
     def forward(self, x):
@@ -278,7 +278,7 @@ for epoch in range(opt.niterG1):
         optimizerG1.step()
 
         if i % 10 == 0:
-            print(f'[{epoch:2d}/{opt.niterG1:2d}][{i:2d}/{len(data_loader):2d}] '
+            print(f'[{epoch:2d}/{opt.niterG1:2d}][{i:3d}/{len(data_loader):3d}] '
                   f'Loss_G1: {errG1.data.item():7.4f}')
 
     if epoch % 1 == 0:
@@ -305,7 +305,8 @@ for epoch in range(opt.niterG2):
         netG2.zero_grad()
         netD.zero_grad()
 
-        label = torch.tensor([real_label for _ in range(condition_Ia.shape[0])])
+        # label = torch.tensor([real_label for _ in range(condition_Ia.shape[0])])
+        label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(condition_Ia.shape[0])])
 
         if opt.cuda:
             condition_Ia = condition_Ia.cuda()
@@ -329,10 +330,11 @@ for epoch in range(opt.niterG2):
 
         output_fake = netD(fake_pair.detach())  # detach
         output_fake = torch.squeeze(output_fake, 1)
-        label.data.fill_(fake_label)
+        # label.data.fill_(fake_label)
+        label = torch.tensor([random.uniform(0.0, 0.3) for _ in range(condition_Ia.shape[0])])
         errD_fake = BCE_criterion(output_fake, label)
 
-        errD = 0.5 * (errD_real + errD_fake)
+        errD = errD_real + errD_fake
         errD.backward()
 
         optimizerD.step()
@@ -340,7 +342,8 @@ for epoch in range(opt.niterG2):
         # train G with pairs
         output_fake = netD(fake_pair)
         output_fake = torch.squeeze(output_fake, 1)
-        label.data.fill_(real_label)  # fake labels are real for generator cost
+        # label.data.fill_(real_label)  # fake labels are real for generator cost
+        label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(condition_Ia.shape[0])])
         errG2BCE = BCE_criterion(output_fake, label)
         errG2L1 = L1_criterion(refined_pred_Ib, target_Ib)
         errG2 = errG2BCE + opt.L1_lambda * errG2L1
@@ -349,7 +352,7 @@ for epoch in range(opt.niterG2):
         optimizerG2.step()
 
         if i % 1 == 0:
-            print(f'[{epoch:2d}/{opt.niterG2:2d}][{i:2d}/{len(data_loader):2d}] '
+            print(f'[{epoch:2d}/{opt.niterG2:2d}][{i:3d}/{len(data_loader):3d}] '
                   f'Loss_G2: {errG2.item():7.4f} '
                   f'Loss_G2BCE: {errG2BCE.item():7.4f} '
                   f'Loss_G2L1: {errG2L1.item():7.4f} '
