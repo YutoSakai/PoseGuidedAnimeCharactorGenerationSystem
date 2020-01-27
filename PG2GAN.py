@@ -305,8 +305,9 @@ for epoch in range(opt.niterG2):
         netG2.zero_grad()
         netD.zero_grad()
 
-        # label = torch.tensor([real_label for _ in range(condition_Ia.shape[0])])
-        label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(condition_Ia.shape[0])])
+        label = torch.tensor([real_label for _ in range(condition_Ia.shape[0])])
+        # label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(condition_Ia.shape[0])])
+        # これを作る時点でメモリオーバー
 
         if opt.cuda:
             condition_Ia = condition_Ia.cuda()
@@ -330,8 +331,8 @@ for epoch in range(opt.niterG2):
 
         output_fake = netD(fake_pair.detach())  # detach
         output_fake = torch.squeeze(output_fake, 1)
-        # label.data.fill_(fake_label)
-        label = torch.tensor([random.uniform(0.0, 0.3) for _ in range(condition_Ia.shape[0])])
+        label.data.fill_(fake_label)
+        # label = torch.tensor([random.uniform(0.0, 0.3) for _ in range(condition_Ia.shape[0])])
         errD_fake = BCE_criterion(output_fake, label)
 
         errD = errD_real + errD_fake
@@ -342,7 +343,7 @@ for epoch in range(opt.niterG2):
         # train G with pairs
         output_fake = netD(fake_pair)
         output_fake = torch.squeeze(output_fake, 1)
-        # label.data.fill_(real_label)  # fake labels are real for generator cost
+        label.data.fill_(real_label)  # fake labels are real for generator cost
 
         errG2BCE = BCE_criterion(output_fake, label)
         errG2L1 = L1_criterion(refined_pred_Ib, target_Ib)
