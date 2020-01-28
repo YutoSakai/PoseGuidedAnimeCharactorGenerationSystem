@@ -196,24 +196,29 @@ class NetD(nn.Module):
             nn.Conv2d(6, ndf, 4, 2, 1, bias=False),
             nn.LeakyReLU(0.2),
             # state bs x (ndf) x 128 x 128
-            nn.Conv2d(ndf, ndf * 2, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ndf * 2),
+            # nn.Conv2d(ndf, ndf * 2, 4, 2, 1, bias=False)
+            # nn.BatchNorm2d(ndf * 2),
+            nn.utils.spectral_norm(nn.Conv2d(ndf, ndf * 2, 4, 2, 1, bias=False)),
             nn.LeakyReLU(0.2),
             # state bs x (ndf*2) x 64 x 64
-            nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ndf * 4),
+            # nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 1, bias=False)
+            # nn.BatchNorm2d(ndf * 4),
+            nn.utils.spectral_norm(nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 1, bias=False)),
             nn.LeakyReLU(0.2),
             # state bs x (ndf*4) x 32 x 32
-            nn.Conv2d(ndf * 4, ndf * 8, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ndf * 8),
+            # nn.Conv2d(ndf * 4, ndf * 8, 4, 2, 1, bias=False),
+            # nn.BatchNorm2d(ndf * 8),
+            nn.utils.spectral_norm(nn.Conv2d(ndf * 4, ndf * 8, 4, 2, 1, bias=False)),
             nn.LeakyReLU(0.2),
             # state bs x (ndf*8) x 16 x 16
-            nn.Conv2d(ndf * 8, ndf * 16, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ndf * 16),
+            # nn.Conv2d(ndf * 8, ndf * 16, 4, 2, 1, bias=False),
+            # nn.BatchNorm2d(ndf * 16),
+            nn.utils.spectral_norm(nn.Conv2d(ndf * 8, ndf * 16, 4, 2, 1, bias=False)),
             nn.LeakyReLU(0.2),
             # state bs x (ndf*16) x 8 x 8
-            nn.Conv2d(ndf * 16, ndf * 32, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ndf * 32),
+            # nn.Conv2d(ndf * 16, ndf * 32, 4, 2, 1, bias=False),
+            # nn.BatchNorm2d(ndf * 32),
+            nn.utils.spectral_norm(nn.Conv2d(ndf * 16, ndf * 32, 4, 2, 1, bias=False)),
             nn.LeakyReLU(0.2),
             # state bs x (ndf) x 4 x 4
             nn.Conv2d(ndf * 32, 1, 4, 1, 0, bias=False),
