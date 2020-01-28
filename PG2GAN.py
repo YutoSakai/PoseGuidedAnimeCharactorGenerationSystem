@@ -339,7 +339,7 @@ for epoch in range(opt.niterG2):
         # label.data.fill_(fake_label)
         label = torch.tensor([random.uniform(0.0, 0.3) for _ in range(condition_Ia.shape[0])])
         if opt.cuda:
-            label.cuda()
+            label = label.cuda()
         errD_fake = BCE_criterion(output_fake, label)
 
         errD = errD_real + errD_fake
@@ -353,7 +353,7 @@ for epoch in range(opt.niterG2):
         # label.data.fill_(real_label)  # fake labels are real for generator cost
         label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(condition_Ia.shape[0])])
         if opt.cuda:
-            label.cuda()
+            label = label.cuda()
         errG2BCE = BCE_criterion(output_fake, label)
         errG2L1 = L1_criterion(refined_pred_Ib, target_Ib)
         errG2 = errG2BCE + opt.L1_lambda * errG2L1
