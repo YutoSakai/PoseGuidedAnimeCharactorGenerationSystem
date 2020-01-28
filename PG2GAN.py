@@ -222,7 +222,7 @@ class NetD(nn.Module):
             nn.LeakyReLU(0.2),
             # state bs x (ndf) x 4 x 4
             nn.Conv2d(ndf * 32, 1, 4, 1, 0, bias=False),
-            nn.Tanh()
+            nn.Sigmoid()
         )
 
     def forward(self, x):
