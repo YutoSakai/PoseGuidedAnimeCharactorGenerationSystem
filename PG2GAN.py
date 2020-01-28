@@ -116,7 +116,8 @@ class NetG1(nn.Module):
         out_from_de_5 = self.deconv_5(self.de_block_5(out_from_de_4 + out_from_e_2), output_size=out_from_e_1.size())
         out_from_de_6 = self.deconv_6(self.de_block_6(out_from_de_5 + out_from_e_1))
 
-        return out_from_de_6
+
+        return nn.Sigmoid(out_from_de_6)
 
 
 class NetG2(nn.Module):
@@ -164,7 +165,7 @@ class NetG2(nn.Module):
         out_from_de_3 = self.deconv_3(self.de_block_3(out_from_de_2 + out_from_e_2), output_size=out_from_e_1.size())
         out_from_de_4 = self.deconv_4(self.de_block_4(out_from_de_3 + out_from_e_1))
 
-        return out_from_de_4
+        return nn.Sigmoid(out_from_de_4)
 
 
 class ResBlock(nn.Module):
@@ -310,8 +311,8 @@ for epoch in range(opt.niterG2):
         netG2.zero_grad()
         netD.zero_grad()
 
-        label = torch.tensor([real_label for _ in range(condition_Ia.shape[0])])
-        # label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(condition_Ia.shape[0])])
+        # label = torch.tensor([real_label for _ in range(condition_Ia.shape[0])])
+        label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(condition_Ia.shape[0])])
         # これを作る時点でメモリオーバー
 
         if opt.cuda:
@@ -336,8 +337,8 @@ for epoch in range(opt.niterG2):
 
         output_fake = netD(fake_pair.detach())  # detach
         output_fake = torch.squeeze(output_fake, 1)
-        label.data.fill_(fake_label)
-        # label = torch.tensor([random.uniform(0.0, 0.3) for _ in range(condition_Ia.shape[0])])
+        # label.data.fill_(fake_label)
+        label = torch.tensor([random.uniform(0.0, 0.3) for _ in range(condition_Ia.shape[0])])
         errD_fake = BCE_criterion(output_fake, label)
 
         errD = errD_real + errD_fake
@@ -348,8 +349,8 @@ for epoch in range(opt.niterG2):
         # train G with pairs
         output_fake = netD(fake_pair)
         output_fake = torch.squeeze(output_fake, 1)
-        label.data.fill_(real_label)  # fake labels are real for generator cost
-
+        # label.data.fill_(real_label)  # fake labels are real for generator cost
+        label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(condition_Ia.shape[0])])
         errG2BCE = BCE_criterion(output_fake, label)
         errG2L1 = L1_criterion(refined_pred_Ib, target_Ib)
         errG2 = errG2BCE + opt.L1_lambda * errG2L1
