@@ -47,9 +47,11 @@ class Keypoints_from_images:
             int(datum.poseKeypoints)
             return None, None
         except:
-            return_img = self.draw_keypoints(image, datum.poseKeypoints)
-            return image, return_img
-
+            keypoints_image = self.draw_keypoints(image, datum.poseKeypoints)
+            # return image, keypoints_image
+            return_image = cv2.resize(image, (int(image.shape[0]/4), int(image.shape[1]/4)))
+            return_keypoints_image = cv2.resize(keypoints_image, (int(keypoints_image.shape[0]/4), int(keypoints_image.shape[1]/4)))
+            return return_image, return_keypoints_image
 
 if __name__ == '__main__':
 
