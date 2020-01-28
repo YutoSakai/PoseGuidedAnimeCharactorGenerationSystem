@@ -116,7 +116,6 @@ class NetG1(nn.Module):
         out_from_de_5 = self.deconv_5(self.de_block_5(out_from_de_4 + out_from_e_2), output_size=out_from_e_1.size())
         out_from_de_6 = self.deconv_6(self.de_block_6(out_from_de_5 + out_from_e_1))
 
-
         return nn.functional.sigmoid(out_from_de_6)
 
 
