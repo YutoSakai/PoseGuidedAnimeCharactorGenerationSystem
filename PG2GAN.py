@@ -408,7 +408,7 @@ for epoch in range(opt.niterG2):
             test_fake_pair = torch.cat((test_condition_Ia, test_refined_pred_Ib), 1)  # input_D bs x 6 x256 x 256
 
             # train D with pairs
-            label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(condition_Ia.shape[0])])
+            label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(test_condition_Ia.shape[0])])
             test_output_real = netD(test_real_pair)
             test_output_real = torch.squeeze(test_output_real, 1)
             test_errD_real = BCE_criterion(test_output_real, label)
