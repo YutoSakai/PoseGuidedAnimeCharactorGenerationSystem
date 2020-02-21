@@ -396,43 +396,43 @@ for epoch in range(opt.niterG2):
             test_condition_Ia, test_target_Pb, test_target_Ib = test_data
             netG2.zero_grad()
             netD.zero_grad()
-            test_label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(test_condition_Ia.shape[0])])
+            # test_label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(test_condition_Ia.shape[0])])
             if opt.cuda:
                 test_condition_Ia = test_condition_Ia.cuda()
                 test_target_Pb = test_target_Pb.cuda()
                 test_target_Ib = test_target_Ib.cuda()
-                test_label = test_label.cuda()
+                # test_label = test_label.cuda()
             test_input_G1 = torch.cat((test_condition_Ia, test_target_Pb), 1)  # input_G1 bs x 21 x 256 x256
             test_pred_Ib = netG1(test_input_G1)
             test_input_G2 = torch.cat((test_condition_Ia, test_pred_Ib), 1)  # input_G2 bs x 6 x 256 x256
             test_refined_pred_Ib = test_pred_Ib + netG2(test_input_G2)
-            test_real_pair = torch.cat((test_condition_Ia, test_target_Ib), 1)  # input_D bs x 6 x256 x 256
-            test_fake_pair = torch.cat((test_condition_Ia, test_refined_pred_Ib), 1)  # input_D bs x 6 x256 x 256
-
-            # train D with pairs
-            test_output_real = netD(test_real_pair)
-            test_output_real = torch.squeeze(test_output_real, 1)
-            test_errD_real = BCE_criterion(test_output_real, test_label)
-
-            test_output_fake = netD(test_fake_pair.detach())  # detach
-            test_output_fake = torch.squeeze(test_output_fake, 1)
-            # label.data.fill_(fake_label)
-            test_label = torch.tensor([random.uniform(0.0, 0.3) for _ in range(test_condition_Ia.shape[0])])
-            if opt.cuda:
-                test_label = test_label.cuda()
-            test_errD_fake = BCE_criterion(test_output_fake, test_label)
-
-            test_errD = test_errD_real + test_errD_fake
-
-            # train G with pairs
-            test_output_fake = netD(test_fake_pair)
-            test_output_fake = torch.squeeze(test_output_fake, 1)
-            test_label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(test_condition_Ia.shape[0])])
-            if opt.cuda:
-                test_label = test_label.cuda()
-            test_errG2BCE = BCE_criterion(test_output_fake, test_label)
-            test_errG2L1 = L1_criterion(test_refined_pred_Ib, test_target_Ib)
-            test_errG2 = test_errG2BCE + opt.L1_lambda * test_errG2L1
+            # test_real_pair = torch.cat((test_condition_Ia, test_target_Ib), 1)  # input_D bs x 6 x256 x 256
+            # test_fake_pair = torch.cat((test_condition_Ia, test_refined_pred_Ib), 1)  # input_D bs x 6 x256 x 256
+            #
+            # # train D with pairs
+            # test_output_real = netD(test_real_pair)
+            # test_output_real = torch.squeeze(test_output_real, 1)
+            # test_errD_real = BCE_criterion(test_output_real, test_label)
+            #
+            # test_output_fake = netD(test_fake_pair.detach())  # detach
+            # test_output_fake = torch.squeeze(test_output_fake, 1)
+            # # label.data.fill_(fake_label)
+            # test_label = torch.tensor([random.uniform(0.0, 0.3) for _ in range(test_condition_Ia.shape[0])])
+            # if opt.cuda:
+            #     test_label = test_label.cuda()
+            # test_errD_fake = BCE_criterion(test_output_fake, test_label)
+            #
+            # test_errD = test_errD_real + test_errD_fake
+            #
+            # # train G with pairs
+            # test_output_fake = netD(test_fake_pair)
+            # test_output_fake = torch.squeeze(test_output_fake, 1)
+            # test_label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(test_condition_Ia.shape[0])])
+            # if opt.cuda:
+            #     test_label = test_label.cuda()
+            # test_errG2BCE = BCE_criterion(test_output_fake, test_label)
+            # test_errG2L1 = L1_criterion(test_refined_pred_Ib, test_target_Ib)
+            # test_errG2 = test_errG2BCE + opt.L1_lambda * test_errG2L1
             vutils.save_image(test_condition_Ia[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_condition_Ia_trainingG2_epoch_%03d_%03d.png' % (epoch, i),
                               normalize=True)
             vutils.save_image(test_target_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_target_Ib_trainingG2_epoch_%03d_%03d.png' % (epoch, i),
@@ -441,13 +441,13 @@ for epoch in range(opt.niterG2):
                               normalize=True)
             vutils.save_image(test_refined_pred_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_refined_pred_Ib_trainingG2_epoch_%03d_%03d.png' % (epoch, i),
                               normalize=True)
-            print(f'[{epoch:2d}/{opt.niterG2:2d}][{i:3d}/{len(test_data_loader):3d}] '
-                  f'Loss_test_G2: {test_errG2.item():7.4f} '
-                  f'Loss_test_G2BCE: {test_errG2BCE.item():7.4f} '
-                  f'Loss_test_G2L1: {test_errG2L1.item():7.4f} '
-                  f'Loss_test_D: {test_errD.item():7.4f} '
-                  f'Loss_test_D_real: {test_errD_real.item():7.4f} '
-                  f'Loss_test_D_fake: {test_errD_fake.item():7.4f} ')
+            # print(f'[{epoch:2d}/{opt.niterG2:2d}][{i:3d}/{len(test_data_loader):3d}] '
+            #       f'Loss_test_G2: {test_errG2.item():7.4f} '
+            #       f'Loss_test_G2BCE: {test_errG2BCE.item():7.4f} '
+            #       f'Loss_test_G2L1: {test_errG2L1.item():7.4f} '
+            #       f'Loss_test_D: {test_errD.item():7.4f} '
+            #       f'Loss_test_D_real: {test_errD_real.item():7.4f} '
+            #       f'Loss_test_D_fake: {test_errD_fake.item():7.4f} ')
 
         vutils.save_image(condition_Ia[:, [2, 1, 0], :, :], 'out_'+opt.date+'/condition_Ia_trainingG2_epoch_%03d.png' % epoch,
                           normalize=True)
