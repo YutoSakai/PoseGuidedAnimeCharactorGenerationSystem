@@ -14,9 +14,9 @@ delete_args = ['rm']
 
 
 class MyDataset(torch.utils.data.Dataset):
-    def __init__(self, transform=None):
+    def __init__(self, image_names="/img_highres/**/*.jpg", transform=None):
         self.transform = transform
-        self.img_paths = [img_path for img_path in glob.glob("/img_highres/**/*.jpg", recursive=True)]
+        self.img_paths = [img_path for img_path in glob.glob(image_names, recursive=True)]
         self.pair = []
         self.keypoints_estimate = keypoints_from_images.Keypoints_from_images()  # Keypoints_from_imagesクラスをインスタンス化
         for i, img_path in enumerate(self.img_paths):

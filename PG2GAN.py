@@ -10,6 +10,7 @@ import torch
 import cv2
 import numpy as np
 from torch.autograd import Variable
+import subprocess
 
 from Dataset import MyDataset
 
@@ -20,8 +21,12 @@ parser.add_argument('--niterG2', type=int, default=10, help='number of epochs to
 parser.add_argument('--L1_lambda', type=int, default=1, help='L1_lambda for G2')
 parser.add_argument('--cuda', action='store_true', help='enables cuda')
 parser.add_argument('--manualSeed', type=int, help='manual seed')
+parser.add_argument('--date', type=str, default='default', help='train date will be directory name')
 
 opt = parser.parse_args()
+args = ['mkdir', 'out_'+opt.date, 'outpth_'+opt.date]
+res = subprocess.call(args)
+
 print(opt)
 if opt.manualSeed is None:
     opt.manualSeed = random.randint(1, 10000)
@@ -33,8 +38,11 @@ if opt.cuda:
     torch.manual_seed(opt.manualSeed)
 
 data_set = MyDataset()
+test_data_set = MyDataset("/test_images/**/*.jpg")
 data_loader = torch.utils.data.DataLoader(data_set, batch_size=opt.batchSize, shuffle=True)
+test_data_loader = torch.utils.data.DataLoader(test_data_set, batch_size=opt.batchSize, shuffle=True)
 print(len(data_set))
+print(len(test_data_set))
 
 
 cudnn.benchmark = True
@@ -286,22 +294,34 @@ for epoch in range(opt.niterG1):
             print(f'[{epoch:2d}/{opt.niterG1:2d}][{i:3d}/{len(data_loader):3d}] '
                   f'Loss_G1: {errG1.data.item():7.4f}')
 
-    if epoch % 1 == 0:
-        # cv2.imwrite(f'out/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
-        #             cv2.cvtColor(condition_Ia, cv2.COLOR_RGB2BGR))
-        # cv2.imwrite(f'out/target_Ib_trainingG1_epoch_%03d.png' % epoch,
-        #             cv2.cvtColor(target_Ib, cv2.COLOR_RGB2BGR))
-        # cv2.imwrite(f'out/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
-        #             cv2.cvtColor(pred_Ib, cv2.COLOR_RGB2BGR))
-        vutils.save_image(condition_Ia[:, [2, 1, 0], :, :], 'out_lossD_0.5/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
+    if epoch % 10 == 0:
+        for i, test_data in enumerate(test_data_loader):
+            test_condition_Ia, test_target_Pb, test_target_Ib = test_data
+            if opt.cuda:
+                test_condition_Ia = test_condition_Ia.cuda()
+                test_target_Pb = test_target_Pb.cuda()
+                test_target_Ib = test_target_Ib.cuda()
+            test_input_G1 = torch.cat((test_condition_Ia, test_target_Pb), 1)  # input_G1 bs x 21 x 256 x256
+            test_pred_Ib = netG1(test_input_G1)
+            test_errG1 = L1_criterion(test_pred_Ib, test_target_Ib)  # this is not pose-mask-loss
+            vutils.save_image(test_condition_Ia[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_condition_Ia_trainingG1_epoch_%03d_%03d.png' % epoch % i,
+                              normalize=True)
+            vutils.save_image(test_target_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_target_Ib_trainingG1_epoch_%03d_%03d.png' % epoch % i,
+                              normalize=True)
+            vutils.save_image(test_pred_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_pred_Ib_trainingG1_epoch_%03d_%03d.png' % epoch % i,
+                              normalize=True)
+            print(f'[{epoch:2d}/{opt.niterG1:2d}][{i:3d}/{len(test_data_loader):3d}] '
+                  f'Loss_test_G1: {test_errG1.data.item():7.4f}')
+
+        vutils.save_image(condition_Ia[:, [2, 1, 0], :, :], 'out_'+opt.date+'/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
-        vutils.save_image(target_Ib[:, [2, 1, 0], :, :], 'out_lossD_0.5/target_Ib_trainingG1_epoch_%03d.png' % epoch,
+        vutils.save_image(target_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/target_Ib_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
-        vutils.save_image(pred_Ib[:, [2, 1, 0], :, :], 'out_lossD_0.5/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
+        vutils.save_image(pred_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
                           normalize=True)
     # do checkpointing
     if epoch % 1 == 0:
-        torch.save(netG1.state_dict(), 'outpth/netG1_epoch_%d.pth' % epoch)
+        torch.save(netG1.state_dict(), 'outpth_'+opt.date+'/netG1_epoch_%d.pth' % epoch)
 
 '''training Adversarial net (G2 and D)'''
 for epoch in range(opt.niterG2):
@@ -370,18 +390,68 @@ for epoch in range(opt.niterG2):
                   f'Loss_D_real: {errD_real.item():7.4f} '
                   f'Loss_D_fake: {errD_fake.item():7.4f} ')
 
-    if epoch % 1 == 0:
-        # cv2.imwrite(f'out/condition_Ia_trainingG2_epoch_%03d.png' % epoch, condition_Ia)
-        # cv2.imwrite(f'out/target_Ib_trainingG2_epoch_%03d.png' % epoch, target_Ib)
-        # cv2.imwrite(f'out/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch, refined_pred_Ib)
-        vutils.save_image(condition_Ia[:, [2, 1, 0], :, :], 'out_lossD_0.5/condition_Ia_trainingG2_epoch_%03d.png' % epoch,
+    if epoch % 10 == 0:
+        for i, test_data in enumerate(test_data_loader):
+            test_condition_Ia, test_target_Pb, test_target_Ib = test_data
+            if opt.cuda:
+                test_condition_Ia = test_condition_Ia.cuda()
+                test_target_Pb = test_target_Pb.cuda()
+                test_target_Ib = test_target_Ib.cuda()
+            test_input_G1 = torch.cat((test_condition_Ia, test_target_Pb), 1)  # input_G1 bs x 21 x 256 x256
+            test_pred_Ib = netG1(test_input_G1)
+            test_input_G2 = torch.cat((test_condition_Ia, test_pred_Ib), 1)  # input_G2 bs x 6 x 256 x256
+            test_refined_pred_Ib = test_pred_Ib + netG2(test_input_G2)
+            test_real_pair = torch.cat((test_condition_Ia, test_target_Ib), 1)  # input_D bs x 6 x256 x 256
+            test_fake_pair = torch.cat((test_condition_Ia, test_refined_pred_Ib), 1)  # input_D bs x 6 x256 x 256
+
+            # train D with pairs
+            test_output_real = netD(test_real_pair)
+            test_output_real = torch.squeeze(test_output_real, 1)
+            test_errD_real = BCE_criterion(test_output_real, label)
+
+            test_output_fake = netD(test_fake_pair.detach())  # detach
+            test_output_fake = torch.squeeze(test_output_fake, 1)
+            # label.data.fill_(fake_label)
+            label = torch.tensor([random.uniform(0.0, 0.3) for _ in range(test_condition_Ia.shape[0])])
+            if opt.cuda:
+                label = label.cuda()
+            test_errD_fake = BCE_criterion(test_output_fake, label)
+
+            test_errD = test_errD_real + test_errD_fake
+
+            # train G with pairs
+            test_output_fake = netD(test_fake_pair)
+            test_output_fake = torch.squeeze(test_output_fake, 1)
+            test_label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(test_condition_Ia.shape[0])])
+            if opt.cuda:
+                label = label.cuda()
+            test_errG2BCE = BCE_criterion(test_output_fake, label)
+            test_errG2L1 = L1_criterion(test_refined_pred_Ib, test_target_Ib)
+            test_errG2 = test_errG2BCE + opt.L1_lambda * test_errG2L1
+            vutils.save_image(test_condition_Ia[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_condition_Ia_trainingG2_epoch_%03d_%03d.png' % epoch % i,
+                              normalize=True)
+            vutils.save_image(test_target_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_target_Ib_trainingG2_epoch_%03d_%03d.png' % epoch % i,
+                              normalize=True)
+            vutils.save_image(test_pred_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_pred_Ib_trainingG2_epoch_%03d_%03d.png' % epoch % i,
+                              normalize=True)
+            vutils.save_image(test_refined_pred_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_refined_pred_Ib_trainingG2_epoch_%03d_%03d.png' % epoch % i,
+                              normalize=True)
+            print(f'[{epoch:2d}/{opt.niterG2:2d}][{i:3d}/{len(test_data_loader):3d}] '
+                  f'Loss_test_G2: {test_errG2.item():7.4f} '
+                  f'Loss_test_G2BCE: {test_errG2BCE.item():7.4f} '
+                  f'Loss_test_G2L1: {test_errG2L1.item():7.4f} '
+                  f'Loss_test_D: {test_errD.item():7.4f} '
+                  f'Loss_test_D_real: {test_errD_real.item():7.4f} '
+                  f'Loss_test_D_fake: {test_errD_fake.item():7.4f} ')
+
+        vutils.save_image(condition_Ia[:, [2, 1, 0], :, :], 'out_'+opt.date+'/condition_Ia_trainingG2_epoch_%03d.png' % epoch,
                           normalize=True)
-        vutils.save_image(target_Ib[:, [2, 1, 0], :, :], 'out_lossD_0.5/target_Ib_trainingG2_epoch_%03d.png' % epoch,
+        vutils.save_image(target_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/target_Ib_trainingG2_epoch_%03d.png' % epoch,
                           normalize=True)
-        vutils.save_image(refined_pred_Ib[:, [2, 1, 0], :, :], 'out_lossD_0.5/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
+        vutils.save_image(refined_pred_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
                           normalize=True)
 
     # do checkpointing
     if epoch % 1 == 0:
-        torch.save(netG2.state_dict(), 'outpth/netG2_epoch_%d.pth' % epoch)
-        torch.save(netD.state_dict(), 'outpth/netD_epoch_%d.pth' % epoch)
+        torch.save(netG2.state_dict(), 'outpth_'+opt.date+'/netG2_epoch_%d.pth' % epoch)
+        torch.save(netD.state_dict(), 'outpth_'+opt.date+'/netD_epoch_%d.pth' % epoch)
