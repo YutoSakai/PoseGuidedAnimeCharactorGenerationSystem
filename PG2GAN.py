@@ -38,7 +38,7 @@ if opt.cuda:
     torch.manual_seed(opt.manualSeed)
 
 data_set = MyDataset()
-test_data_set = MyDataset("/test_images/**/*.jpg")
+test_data_set = MyDataset("test_images/**/*.jpg")
 data_loader = torch.utils.data.DataLoader(data_set, batch_size=opt.batchSize, shuffle=True)
 test_data_loader = torch.utils.data.DataLoader(test_data_set, batch_size=opt.batchSize, shuffle=True)
 print(len(data_set))
