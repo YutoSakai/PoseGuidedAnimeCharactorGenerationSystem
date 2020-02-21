@@ -396,10 +396,12 @@ for epoch in range(opt.niterG2):
             test_condition_Ia, test_target_Pb, test_target_Ib = test_data
             netG2.zero_grad()
             netD.zero_grad()
+            test_label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(test_condition_Ia.shape[0])])
             if opt.cuda:
                 test_condition_Ia = test_condition_Ia.cuda()
                 test_target_Pb = test_target_Pb.cuda()
                 test_target_Ib = test_target_Ib.cuda()
+                test_label = test_label.cuda()
             test_input_G1 = torch.cat((test_condition_Ia, test_target_Pb), 1)  # input_G1 bs x 21 x 256 x256
             test_pred_Ib = netG1(test_input_G1)
             test_input_G2 = torch.cat((test_condition_Ia, test_pred_Ib), 1)  # input_G2 bs x 6 x 256 x256
@@ -408,7 +410,6 @@ for epoch in range(opt.niterG2):
             test_fake_pair = torch.cat((test_condition_Ia, test_refined_pred_Ib), 1)  # input_D bs x 6 x256 x 256
 
             # train D with pairs
-            test_label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(test_condition_Ia.shape[0])])
             test_output_real = netD(test_real_pair)
             test_output_real = torch.squeeze(test_output_real, 1)
             test_errD_real = BCE_criterion(test_output_real, test_label)
