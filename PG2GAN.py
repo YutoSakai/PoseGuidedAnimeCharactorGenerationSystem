@@ -296,7 +296,6 @@ for epoch in range(opt.niterG1):
 
     if epoch % 10 == 0:
         for i, test_data in enumerate(test_data_loader):
-            netG1.zero_grad()
             test_condition_Ia, test_target_Pb, test_target_Ib = test_data
             if opt.cuda:
                 test_condition_Ia = test_condition_Ia.cuda()
@@ -333,7 +332,6 @@ for epoch in range(opt.niterG2):
 
         # label = torch.tensor([real_label for _ in range(condition_Ia.shape[0])])
         label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(condition_Ia.shape[0])])
-        # これを作る時点でメモリオーバー
 
         if opt.cuda:
             condition_Ia = condition_Ia.cuda()
@@ -394,8 +392,6 @@ for epoch in range(opt.niterG2):
     if epoch % 10 == 0:
         for i, test_data in enumerate(test_data_loader):
             test_condition_Ia, test_target_Pb, test_target_Ib = test_data
-            netG2.zero_grad()
-            netD.zero_grad()
             test_label = torch.tensor([random.uniform(0.7, 1.2) for _ in range(test_condition_Ia.shape[0])])
             if opt.cuda:
                 test_condition_Ia = test_condition_Ia.cuda()
