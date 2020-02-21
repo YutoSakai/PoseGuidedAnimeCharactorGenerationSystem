@@ -304,11 +304,11 @@ for epoch in range(opt.niterG1):
             test_input_G1 = torch.cat((test_condition_Ia, test_target_Pb), 1)  # input_G1 bs x 21 x 256 x256
             test_pred_Ib = netG1(test_input_G1)
             test_errG1 = L1_criterion(test_pred_Ib, test_target_Ib)  # this is not pose-mask-loss
-            vutils.save_image(test_condition_Ia[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_condition_Ia_trainingG1_epoch_%03d_%03d.png' % epoch % i,
+            vutils.save_image(test_condition_Ia[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_condition_Ia_trainingG1_epoch_%03d_%03d.png' % (epoch, i),
                               normalize=True)
-            vutils.save_image(test_target_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_target_Ib_trainingG1_epoch_%03d_%03d.png' % epoch % i,
+            vutils.save_image(test_target_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_target_Ib_trainingG1_epoch_%03d_%03d.png' % (epoch, i),
                               normalize=True)
-            vutils.save_image(test_pred_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_pred_Ib_trainingG1_epoch_%03d_%03d.png' % epoch % i,
+            vutils.save_image(test_pred_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_pred_Ib_trainingG1_epoch_%03d_%03d.png' % (epoch, i),
                               normalize=True)
             print(f'[{epoch:2d}/{opt.niterG1:2d}][{i:3d}/{len(test_data_loader):3d}] '
                   f'Loss_test_G1: {test_errG1.data.item():7.4f}')
@@ -428,13 +428,13 @@ for epoch in range(opt.niterG2):
             test_errG2BCE = BCE_criterion(test_output_fake, label)
             test_errG2L1 = L1_criterion(test_refined_pred_Ib, test_target_Ib)
             test_errG2 = test_errG2BCE + opt.L1_lambda * test_errG2L1
-            vutils.save_image(test_condition_Ia[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_condition_Ia_trainingG2_epoch_%03d_%03d.png' % epoch % i,
+            vutils.save_image(test_condition_Ia[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_condition_Ia_trainingG2_epoch_%03d_%03d.png' % (epoch, i),
                               normalize=True)
-            vutils.save_image(test_target_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_target_Ib_trainingG2_epoch_%03d_%03d.png' % epoch % i,
+            vutils.save_image(test_target_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_target_Ib_trainingG2_epoch_%03d_%03d.png' % (epoch, i),
                               normalize=True)
-            vutils.save_image(test_pred_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_pred_Ib_trainingG2_epoch_%03d_%03d.png' % epoch % i,
+            vutils.save_image(test_pred_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_pred_Ib_trainingG2_epoch_%03d_%03d.png' % (epoch, i),
                               normalize=True)
-            vutils.save_image(test_refined_pred_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_refined_pred_Ib_trainingG2_epoch_%03d_%03d.png' % epoch % i,
+            vutils.save_image(test_refined_pred_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/test_refined_pred_Ib_trainingG2_epoch_%03d_%03d.png' % (epoch, i),
                               normalize=True)
             print(f'[{epoch:2d}/{opt.niterG2:2d}][{i:3d}/{len(test_data_loader):3d}] '
                   f'Loss_test_G2: {test_errG2.item():7.4f} '
