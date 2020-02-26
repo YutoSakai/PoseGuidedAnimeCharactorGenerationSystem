@@ -265,7 +265,7 @@ print(params)  # 121898
 netD = NetD()
 netD.apply(weights_init)
 params = 0
-for p in netG2.parameters():
+for p in net.parameters():
     if p.requires_grad:
         params += p.numel()
 print(params)  # 121898
