@@ -309,6 +309,13 @@ for epoch in range(opt.niterG1):
         if i % 10 == 0:
             print(f'[{epoch:2d}/{opt.niterG1:2d}][{i:3d}/{len(data_loader):3d}] '
                   f'Loss_G1: {errG1.data.item():7.4f}')
+
+        vutils.save_image(condition_Ia[:, [2, 1, 0], :, :], 'out_'+opt.date+'/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
+                          normalize=True)
+        vutils.save_image(target_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/target_Ib_trainingG1_epoch_%03d.png' % epoch,
+                          normalize=True)
+        vutils.save_image(pred_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
+                          normalize=True)
     netG1.eval()
     netG2.eval()
     netD.eval()
@@ -332,12 +339,7 @@ for epoch in range(opt.niterG1):
                 print(f'[{epoch:2d}/{opt.niterG1:2d}][{i:3d}/{len(test_data_loader):3d}] '
                       f'Loss_test_G1: {test_errG1.data.item():7.4f}')
 
-        vutils.save_image(condition_Ia[:, [2, 1, 0], :, :], 'out_'+opt.date+'/condition_Ia_trainingG1_epoch_%03d.png' % epoch,
-                          normalize=True)
-        vutils.save_image(target_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/target_Ib_trainingG1_epoch_%03d.png' % epoch,
-                          normalize=True)
-        vutils.save_image(pred_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/pred_Ib_trainingG1_epoch_%03d.png' % epoch,
-                          normalize=True)
+
     # do checkpointing
     if epoch % 1 == 0:
         torch.save(netG1.state_dict(), 'outpth_'+opt.date+'/netG1_epoch_%d.pth' % epoch)
@@ -410,6 +412,13 @@ for epoch in range(opt.niterG2):
                   f'Loss_D: {errD.item():7.4f} '
                   f'Loss_D_real: {errD_real.item():7.4f} '
                   f'Loss_D_fake: {errD_fake.item():7.4f} ')
+
+        vutils.save_image(condition_Ia[:, [2, 1, 0], :, :], 'out_'+opt.date+'/condition_Ia_trainingG2_epoch_%03d.png' % epoch,
+                          normalize=True)
+        vutils.save_image(target_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/target_Ib_trainingG2_epoch_%03d.png' % epoch,
+                          normalize=True)
+        vutils.save_image(refined_pred_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
+                          normalize=True)
     netG1.eval()
     netG2.eval()
     netD.eval()
@@ -470,12 +479,6 @@ for epoch in range(opt.niterG2):
                       f'Loss_test_D_real: {test_errD_real.item():7.4f} '
                       f'Loss_test_D_fake: {test_errD_fake.item():7.4f} ')
 
-        vutils.save_image(condition_Ia[:, [2, 1, 0], :, :], 'out_'+opt.date+'/condition_Ia_trainingG2_epoch_%03d.png' % epoch,
-                          normalize=True)
-        vutils.save_image(target_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/target_Ib_trainingG2_epoch_%03d.png' % epoch,
-                          normalize=True)
-        vutils.save_image(refined_pred_Ib[:, [2, 1, 0], :, :], 'out_'+opt.date+'/refined_pred_Ib_trainingG2_epoch_%03d.png' % epoch,
-                          normalize=True)
 
     # do checkpointing
     if epoch % 1 == 0:
