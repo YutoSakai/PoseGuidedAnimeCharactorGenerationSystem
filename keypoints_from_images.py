@@ -53,11 +53,10 @@ class Keypoints_from_images:
             return_keypoints_images = []
             for keypoints_image in keypoints_images:
                 resize_keypoints_image = cv2.resize(keypoints_image, (int(keypoints_image.shape[0] / 8), int(keypoints_image.shape[1] / 8)))
-                height, width, channels = resize_keypoints_image.shape[:3]
+                height, width = resize_keypoints_image.shape[:2]
                     # 取得結果（幅，高さ，チャンネル数，depth）を表示
                 print("width: " + str(width))
                 print("height: " + str(height))
-                print("channels: " + str(channels))
                 return_keypoints_images.append(resize_keypoints_image)
             return return_image, return_keypoints_images
 
