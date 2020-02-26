@@ -250,10 +250,25 @@ def weights_init(m):
 '''setup network and initialize weights'''
 netG1 = NetG1()
 netG1.apply(weights_init)
+params = 0
+for p in netG1.parameters():
+    if p.requires_grad:
+        params += p.numel()
+print(params)  # 121898
 netG2 = NetG2()
 netG2.apply(weights_init)
+params = 0
+for p in netG2.parameters():
+    if p.requires_grad:
+        params += p.numel()
+print(params)  # 121898
 netD = NetD()
 netD.apply(weights_init)
+params = 0
+for p in netG2.parameters():
+    if p.requires_grad:
+        params += p.numel()
+print(params)  # 121898
 
 '''criterion'''
 L1_criterion = nn.L1Loss()
